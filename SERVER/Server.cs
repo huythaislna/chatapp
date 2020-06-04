@@ -223,7 +223,7 @@ namespace SERVER
                             SendData(outSuccessHeader, client);
                             var user = getUser(client);
                             usersInRoom.Remove(user);
-                            sendToRoom(adminHeader + "Admin: " + user.Display_name + " has left!!", user.Room_id);
+                            sendToRoom(adminHeader + "Admin: " + user.Display_name + " left!!", user.Room_id);
 
                             string listMember = "";
                             foreach (User member in usersInRoom)
@@ -377,6 +377,7 @@ namespace SERVER
         private void start_btn_Click(object sender, EventArgs e)
         {
             start_btn.Enabled = false;
+            start_btn.BackColor = System.Drawing.Color.Gray;
             Setup();
             power_lb.Text = "ON";
             power_lb.ForeColor = System.Drawing.Color.Green;
@@ -384,7 +385,7 @@ namespace SERVER
 
         private void Server_Load(object sender, EventArgs e)
         {
-            Setup();
+            //Setup();
         }
     }
 }

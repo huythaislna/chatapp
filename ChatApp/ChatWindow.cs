@@ -107,25 +107,41 @@ namespace ChatApp
                     {
                         
                         message = message.Replace(chatHeader, "");
-                        for (int i = 0; i < message.Length; i += 45)
+                        //for (int i = 0; i < message.Length; i += 45)
+                        //{
+                        //    int numberCharInLine = 45;
+                        //    string partialMessage;
+                        //    try
+                        //    {
+                        //        while (message[i + numberCharInLine] != ' ')
+                        //        {
+                        //            numberCharInLine--;
+                        //        }
+                        //        partialMessage = message.Substring(i, numberCharInLine);
+                        //    }
+                        //    catch
+                        //    {
+                        //        partialMessage = message.Substring(i, message.Length - i);
+                        //    }
+                        //    chat_lw.Items.Add(partialMessage);
+                        //    int visibleItems = chat_lw.ClientSize.Height / chat_lw.ItemHeight;
+                        //    chat_lw.TopIndex = Math.Max(chat_lw.Items.Count - visibleItems + 1, 0);
+                        //}
+
+                        
+                        while (message.Length != 0)
                         {
-                            int numberCharInLine = 45;
-                            string partialMessage;
-                            try
+                            int i = break_pos(message);
+                            if (i != message.Length)
                             {
-                                while (message[i + numberCharInLine] != ' ')
-                                {
-                                    numberCharInLine--;
-                                }
-                                partialMessage = message.Substring(i, numberCharInLine);
+                                print(message.Remove(i + 1));
+                                message = message.Remove(0, i);
                             }
-                            catch
+                            else
                             {
-                                partialMessage = message.Substring(i, message.Length - i);
+                                print(message);
+                                message = "";
                             }
-                            chat_lw.Items.Add(partialMessage);
-                            int visibleItems = chat_lw.ClientSize.Height / chat_lw.ItemHeight;
-                            chat_lw.TopIndex = Math.Max(chat_lw.Items.Count - visibleItems + 1, 0);
                         }
                     }
 
@@ -137,6 +153,7 @@ namespace ChatApp
                 }
             }
         }
+
         private void SendData(string message)
         {
             try
@@ -162,8 +179,7 @@ namespace ChatApp
 
         private void ChatWindow_Load(object sender, EventArgs e)
         {
-            SendData(startChatSession + "|" + Client.username + "|" + Client.room_id);
-            //group_name_gb.Text = Client.room_name.ToUpper() + " - ID: " + Client.room_id;
+            SendData(startChatSession + "|" + Client.username + "|" + Client.room_id);;
             group_name_gb.Text = Client.room_name.ToUpper() + " - ID: " + Client.room_id;
         }
         private void message_tb_KeyDown(object sender, KeyEventArgs e)
@@ -178,7 +194,31 @@ namespace ChatApp
                 }
             }
         }
+        private int break_pos(string mess)
+        {
+            
+            if (mess.Length > 42)
+            {
+                for (int i = 42; i > 0; i--)
+                {
+                    if (mess[i] == ' ')
+                    {
+                        return i;
+                    }
+                }
+                return 42;
+            }
+            return mess.Length;
 
+
+        }
+        private void print(string m)
+        {
+            //ListViewItem it = new ListViewItem(m);
+            chat_lw.Items.Add(m);
+            int visibleItems = chat_lw.ClientSize.Height / chat_lw.ItemHeight;
+            chat_lw.TopIndex = Math.Max(chat_lw.Items.Count - visibleItems + 1, 0);
+        }
         private void pictureBox1_Click(object sender, EventArgs e)
         {
             if (message_tb.Text != "")

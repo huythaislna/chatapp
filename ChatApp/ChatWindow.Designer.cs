@@ -48,7 +48,7 @@
             this.member_gb.Controls.Add(this.member_lv);
             this.member_gb.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.member_gb.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.member_gb.Location = new System.Drawing.Point(13, 33);
+            this.member_gb.Location = new System.Drawing.Point(13, 34);
             this.member_gb.Name = "member_gb";
             this.member_gb.Size = new System.Drawing.Size(186, 348);
             this.member_gb.TabIndex = 4;
@@ -57,7 +57,8 @@
             // 
             // member_lv
             // 
-            this.member_lv.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.member_lv.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.member_lv.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.member_lv.GridLines = true;
             this.member_lv.HideSelection = false;
             this.member_lv.Location = new System.Drawing.Point(7, 22);
@@ -84,7 +85,7 @@
             this.group_name_gb.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.group_name_gb.Location = new System.Drawing.Point(228, 4);
             this.group_name_gb.Name = "group_name_gb";
-            this.group_name_gb.Size = new System.Drawing.Size(549, 377);
+            this.group_name_gb.Size = new System.Drawing.Size(549, 380);
             this.group_name_gb.TabIndex = 5;
             this.group_name_gb.TabStop = false;
             this.group_name_gb.Text = "groupName";
@@ -97,7 +98,7 @@
             this.chat_lw.ItemHeight = 26;
             this.chat_lw.Location = new System.Drawing.Point(6, 25);
             this.chat_lw.Name = "chat_lw";
-            this.chat_lw.Size = new System.Drawing.Size(536, 342);
+            this.chat_lw.Size = new System.Drawing.Size(536, 368);
             this.chat_lw.TabIndex = 0;
             // 
             // send_pt
@@ -133,7 +134,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackgroundImage = global::ChatApp.Properties.Resources._800;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(782, 453);
+            this.ClientSize = new System.Drawing.Size(807, 499);
             this.ControlBox = false;
             this.Controls.Add(this.exit_pt);
             this.Controls.Add(this.send_pt);
@@ -141,6 +142,7 @@
             this.Controls.Add(this.message_tb);
             this.Controls.Add(this.member_gb);
             this.DoubleBuffered = true;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ChatWindow";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;

@@ -32,7 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Client));
             this.client_control = new System.Windows.Forms.TabControl();
             this.signin_tab = new System.Windows.Forms.TabPage();
-            this.exit_client_tb = new System.Windows.Forms.Button();
+            this.exit_pb = new System.Windows.Forms.PictureBox();
             this.error_lb = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
@@ -47,7 +47,6 @@
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.room_tab = new System.Windows.Forms.TabPage();
-            this.sign_out_btn = new System.Windows.Forms.Button();
             this.Create_group_btn = new System.Windows.Forms.Button();
             this.join_btn = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
@@ -57,7 +56,7 @@
             this.Join_tb = new System.Windows.Forms.TextBox();
             this.pictureBox5 = new System.Windows.Forms.PictureBox();
             this.signup_tab = new System.Windows.Forms.TabPage();
-            this.exit_bt = new System.Windows.Forms.Button();
+            this.exit_btn = new System.Windows.Forms.PictureBox();
             this.label5 = new System.Windows.Forms.Label();
             this.pictureBox6 = new System.Windows.Forms.PictureBox();
             this.pw2_error_lb = new System.Windows.Forms.Label();
@@ -79,8 +78,10 @@
             this.pictureBox10 = new System.Windows.Forms.PictureBox();
             this.username_tip = new System.Windows.Forms.ToolTip(this.components);
             this.pwd_tip = new System.Windows.Forms.ToolTip(this.components);
+            this.signout_pt = new System.Windows.Forms.PictureBox();
             this.client_control.SuspendLayout();
             this.signin_tab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.exit_pb)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -88,11 +89,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
             this.signup_tab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.exit_btn)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.signout_pt)).BeginInit();
             this.SuspendLayout();
             // 
             // client_control
@@ -117,7 +120,7 @@
             this.signin_tab.BackColor = System.Drawing.SystemColors.Control;
             this.signin_tab.BackgroundImage = global::ChatApp.Properties.Resources._800;
             this.signin_tab.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.signin_tab.Controls.Add(this.exit_client_tb);
+            this.signin_tab.Controls.Add(this.exit_pb);
             this.signin_tab.Controls.Add(this.error_lb);
             this.signin_tab.Controls.Add(this.label2);
             this.signin_tab.Controls.Add(this.linkLabel1);
@@ -141,21 +144,18 @@
             this.signin_tab.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
             this.signin_tab.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseUp);
             // 
-            // exit_client_tb
+            // exit_pb
             // 
-            this.exit_client_tb.BackgroundImage = global::ChatApp.Properties.Resources._800;
-            this.exit_client_tb.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.exit_client_tb.Font = new System.Drawing.Font("Segoe UI Black", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.exit_client_tb.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.exit_client_tb.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.exit_client_tb.Location = new System.Drawing.Point(379, 3);
-            this.exit_client_tb.Name = "exit_client_tb";
-            this.exit_client_tb.Size = new System.Drawing.Size(33, 30);
-            this.exit_client_tb.TabIndex = 38;
-            this.exit_client_tb.Text = "X";
-            this.exit_client_tb.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            this.exit_client_tb.UseVisualStyleBackColor = true;
-            this.exit_client_tb.Click += new System.EventHandler(this.exit_client_tb_Click);
+            this.exit_pb.BackColor = System.Drawing.Color.Transparent;
+            this.exit_pb.BackgroundImage = global::ChatApp.Properties.Resources.unnamed;
+            this.exit_pb.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.exit_pb.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.exit_pb.Location = new System.Drawing.Point(369, 4);
+            this.exit_pb.Name = "exit_pb";
+            this.exit_pb.Size = new System.Drawing.Size(40, 40);
+            this.exit_pb.TabIndex = 39;
+            this.exit_pb.TabStop = false;
+            this.exit_pb.Click += new System.EventHandler(this.exit_pb_Click);
             // 
             // error_lb
             // 
@@ -186,6 +186,7 @@
             // 
             this.linkLabel1.AutoSize = true;
             this.linkLabel1.BackColor = System.Drawing.Color.Transparent;
+            this.linkLabel1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.linkLabel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.linkLabel1.ForeColor = System.Drawing.Color.Yellow;
             this.linkLabel1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -229,6 +230,7 @@
             this.Showpass.AutoSize = true;
             this.Showpass.BackColor = System.Drawing.Color.Transparent;
             this.Showpass.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.Showpass.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Showpass.Font = new System.Drawing.Font("Segoe UI Black", 10F);
             this.Showpass.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.Showpass.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -244,6 +246,7 @@
             // 
             this.signin_btn.BackgroundImage = global::ChatApp.Properties.Resources._100790964_686014118855549_1343039108137615360_n;
             this.signin_btn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.signin_btn.Cursor = System.Windows.Forms.Cursors.Hand;
             this.signin_btn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.signin_btn.Font = new System.Drawing.Font("Segoe UI Black", 10F);
             this.signin_btn.ForeColor = System.Drawing.Color.WhiteSmoke;
@@ -329,7 +332,7 @@
             // room_tab
             // 
             this.room_tab.BackgroundImage = global::ChatApp.Properties.Resources._800;
-            this.room_tab.Controls.Add(this.sign_out_btn);
+            this.room_tab.Controls.Add(this.signout_pt);
             this.room_tab.Controls.Add(this.Create_group_btn);
             this.room_tab.Controls.Add(this.join_btn);
             this.room_tab.Controls.Add(this.label3);
@@ -346,22 +349,11 @@
             this.room_tab.Text = "ROOM";
             this.room_tab.UseVisualStyleBackColor = true;
             // 
-            // sign_out_btn
-            // 
-            this.sign_out_btn.BackgroundImage = global::ChatApp.Properties.Resources._100790964_686014118855549_1343039108137615360_n;
-            this.sign_out_btn.Font = new System.Drawing.Font("Segoe UI Black", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.sign_out_btn.Location = new System.Drawing.Point(283, 452);
-            this.sign_out_btn.Name = "sign_out_btn";
-            this.sign_out_btn.Size = new System.Drawing.Size(126, 41);
-            this.sign_out_btn.TabIndex = 27;
-            this.sign_out_btn.Text = "SIGN OUT";
-            this.sign_out_btn.UseVisualStyleBackColor = true;
-            this.sign_out_btn.Click += new System.EventHandler(this.sign_out_btn_Click);
-            // 
             // Create_group_btn
             // 
             this.Create_group_btn.BackgroundImage = global::ChatApp.Properties.Resources._100790964_686014118855549_1343039108137615360_n;
             this.Create_group_btn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.Create_group_btn.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Create_group_btn.Font = new System.Drawing.Font("Segoe UI Black", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Create_group_btn.Location = new System.Drawing.Point(83, 355);
             this.Create_group_btn.Name = "Create_group_btn";
@@ -374,6 +366,7 @@
             // join_btn
             // 
             this.join_btn.BackgroundImage = global::ChatApp.Properties.Resources._100790964_686014118855549_1343039108137615360_n;
+            this.join_btn.Cursor = System.Windows.Forms.Cursors.Hand;
             this.join_btn.Font = new System.Drawing.Font("Segoe UI Black", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.join_btn.Location = new System.Drawing.Point(142, 296);
             this.join_btn.Name = "join_btn";
@@ -390,7 +383,7 @@
             this.label3.Font = new System.Drawing.Font("Segoe UI Black", 13F);
             this.label3.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.label3.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.label3.Location = new System.Drawing.Point(137, 115);
+            this.label3.Location = new System.Drawing.Point(162, 118);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(100, 30);
             this.label3.TabIndex = 23;
@@ -402,7 +395,7 @@
             this.pictureBox4.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.pictureBox4.Image = global::ChatApp.Properties.Resources.Untitled_1;
             this.pictureBox4.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.pictureBox4.Location = new System.Drawing.Point(17, 15);
+            this.pictureBox4.Location = new System.Drawing.Point(42, 18);
             this.pictureBox4.Name = "pictureBox4";
             this.pictureBox4.Size = new System.Drawing.Size(330, 111);
             this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -426,7 +419,7 @@
             this.label4.BackColor = System.Drawing.Color.Transparent;
             this.label4.Font = new System.Drawing.Font("Segoe UI Black", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.label4.Location = new System.Drawing.Point(44, 180);
+            this.label4.Location = new System.Drawing.Point(35, 180);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(89, 23);
             this.label4.TabIndex = 20;
@@ -457,7 +450,7 @@
             // signup_tab
             // 
             this.signup_tab.BackgroundImage = global::ChatApp.Properties.Resources._800;
-            this.signup_tab.Controls.Add(this.exit_bt);
+            this.signup_tab.Controls.Add(this.exit_btn);
             this.signup_tab.Controls.Add(this.label5);
             this.signup_tab.Controls.Add(this.pictureBox6);
             this.signup_tab.Controls.Add(this.pw2_error_lb);
@@ -484,21 +477,18 @@
             this.signup_tab.Text = "SIGN UP";
             this.signup_tab.UseVisualStyleBackColor = true;
             // 
-            // exit_bt
+            // exit_btn
             // 
-            this.exit_bt.BackgroundImage = global::ChatApp.Properties.Resources._800;
-            this.exit_bt.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.exit_bt.Font = new System.Drawing.Font("Segoe UI Black", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.exit_bt.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.exit_bt.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.exit_bt.Location = new System.Drawing.Point(379, 3);
-            this.exit_bt.Name = "exit_bt";
-            this.exit_bt.Size = new System.Drawing.Size(33, 30);
-            this.exit_bt.TabIndex = 37;
-            this.exit_bt.Text = "X";
-            this.exit_bt.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            this.exit_bt.UseVisualStyleBackColor = true;
-            this.exit_bt.Click += new System.EventHandler(this.exit_bt_Click);
+            this.exit_btn.BackColor = System.Drawing.Color.Transparent;
+            this.exit_btn.BackgroundImage = global::ChatApp.Properties.Resources.unnamed;
+            this.exit_btn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.exit_btn.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.exit_btn.Location = new System.Drawing.Point(369, 4);
+            this.exit_btn.Name = "exit_btn";
+            this.exit_btn.Size = new System.Drawing.Size(40, 40);
+            this.exit_btn.TabIndex = 38;
+            this.exit_btn.TabStop = false;
+            this.exit_btn.Click += new System.EventHandler(this.exit_btn_Click);
             // 
             // label5
             // 
@@ -578,6 +568,7 @@
             this.name_tb.Name = "name_tb";
             this.name_tb.Size = new System.Drawing.Size(143, 23);
             this.name_tb.TabIndex = 18;
+            this.name_tb.Enter += new System.EventHandler(this.name_tb_Enter);
             // 
             // label6
             // 
@@ -596,6 +587,7 @@
             // 
             this.signup_btn.BackgroundImage = global::ChatApp.Properties.Resources._100790964_686014118855549_1343039108137615360_n;
             this.signup_btn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.signup_btn.Cursor = System.Windows.Forms.Cursors.Hand;
             this.signup_btn.Font = new System.Drawing.Font("Segoe UI Black", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.signup_btn.ForeColor = System.Drawing.Color.WhiteSmoke;
             this.signup_btn.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -617,6 +609,8 @@
             this.pw2_tb.Size = new System.Drawing.Size(143, 23);
             this.pw2_tb.TabIndex = 24;
             this.pw2_tb.UseSystemPasswordChar = true;
+            this.pw2_tb.Enter += new System.EventHandler(this.pw2_tb_Enter);
+            this.pw2_tb.KeyDown += new System.Windows.Forms.KeyEventHandler(this.pw2_tb_KeyDown);
             // 
             // label7
             // 
@@ -641,6 +635,7 @@
             this.pwd_tb.TabIndex = 23;
             this.pwd_tip.SetToolTip(this.pwd_tb, resources.GetString("pwd_tb.ToolTip"));
             this.pwd_tb.UseSystemPasswordChar = true;
+            this.pwd_tb.Enter += new System.EventHandler(this.pwd_tb_Enter);
             // 
             // label8
             // 
@@ -665,6 +660,7 @@
             this.username_tb.TabIndex = 21;
             this.username_tip.SetToolTip(this.username_tb, "Username must contain 6 - 15 characters in the length.\r\nOnly lower case or digit " +
         "characters.");
+            this.username_tb.Enter += new System.EventHandler(this.username_tb_Enter);
             // 
             // label9
             // 
@@ -727,6 +723,19 @@
             this.pictureBox10.TabIndex = 36;
             this.pictureBox10.TabStop = false;
             // 
+            // signout_pt
+            // 
+            this.signout_pt.BackColor = System.Drawing.Color.Transparent;
+            this.signout_pt.BackgroundImage = global::ChatApp.Properties.Resources.exit;
+            this.signout_pt.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.signout_pt.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.signout_pt.Location = new System.Drawing.Point(352, 431);
+            this.signout_pt.Name = "signout_pt";
+            this.signout_pt.Size = new System.Drawing.Size(57, 62);
+            this.signout_pt.TabIndex = 28;
+            this.signout_pt.TabStop = false;
+            this.signout_pt.Click += new System.EventHandler(this.signout_pt_Click);
+            // 
             // Client
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -737,6 +746,7 @@
             this.Controls.Add(this.client_control);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Client";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Client_Load);
@@ -746,6 +756,7 @@
             this.client_control.ResumeLayout(false);
             this.signin_tab.ResumeLayout(false);
             this.signin_tab.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.exit_pb)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
@@ -755,11 +766,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
             this.signup_tab.ResumeLayout(false);
             this.signup_tab.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.exit_btn)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.signout_pt)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -790,7 +803,6 @@
         private System.Windows.Forms.TextBox Join_tb;
         private System.Windows.Forms.PictureBox pictureBox5;
         private System.Windows.Forms.Button join_btn;
-        private System.Windows.Forms.Button sign_out_btn;
         private System.Windows.Forms.Button Create_group_btn;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.PictureBox pictureBox6;
@@ -813,7 +825,8 @@
         private System.Windows.Forms.PictureBox pictureBox8;
         private System.Windows.Forms.PictureBox pictureBox9;
         private System.Windows.Forms.PictureBox pictureBox10;
-        private System.Windows.Forms.Button exit_bt;
-        private System.Windows.Forms.Button exit_client_tb;
+        private System.Windows.Forms.PictureBox exit_btn;
+        private System.Windows.Forms.PictureBox exit_pb;
+        private System.Windows.Forms.PictureBox signout_pt;
     }
 }

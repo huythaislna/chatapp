@@ -101,7 +101,7 @@ namespace ChatApp
                 {
                     MessageBox.Show(message);
                     //TcpClient.Client.Shutdown(SocketShutdown.Receive);
-                    this.Close();
+                    client_control.SelectedIndex = 0;
                 }
                 else if (message.StartsWith("Password is invalid"))
                 {
@@ -243,12 +243,7 @@ namespace ChatApp
             }
         }
 
-        private void sign_out_btn_Click(object sender, EventArgs e)
-        {
-            SendData(signOutHeader + "|" + username + "|");
-            listenToServer();
-        }
-
+        
 
 
 
@@ -262,7 +257,6 @@ namespace ChatApp
                 {
                     try
                     {
-
                         SendData(registerHeader + "|" + name_tb.Text + "|" + username_tb.Text + "|" + pwd_tb.Text + "|"); ;
                         listenToServer();
                     }
@@ -382,6 +376,38 @@ namespace ChatApp
 
             flag = false;
 
+        }
+
+        private void exit_pb_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void pw2_tb_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                if (signup_check())
+                {
+                    SendData(registerHeader + "|" + name_tb.Text + "|" + username_tb.Text + "|" + pwd_tb.Text + "|"); ;
+                    listenToServer();
+                }
+                else
+                {
+                    signup_btn.Enabled = true;
+                }
+            }
+        }
+
+        private void exit_btn_Click(object sender, EventArgs e)
+        {
+            client_control.SelectedIndex = 0;
+        }
+
+        private void signout_pt_Click(object sender, EventArgs e)
+        {
+            SendData(signOutHeader + "|" + username + "|");
+            listenToServer();
         }
     }
 }
