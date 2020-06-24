@@ -39,7 +39,7 @@ namespace SERVER
         TcpListener TcpServer;
         public MongoClient dbClient;
         public IMongoDatabase database;
-        static readonly Dictionary<int, TcpClient> list_clients = new Dictionary<int, TcpClient>();
+
         static readonly Dictionary<string, TcpClient> signedInUsers = new Dictionary<string, TcpClient>(); //username - tcpclient.
         static readonly List<User> usersInRoom = new List<User>();
 
@@ -332,7 +332,8 @@ namespace SERVER
                 SendData("Username is existed!", client);
                 return false;
             }
-            if (usernameRegex.IsMatch(username) == false)
+            if (usernameRegex.IsMatch(username) == false || 
+                hasUpperChar.IsMatch(username) == true)
             {
                 SendData("Username is invalid!", client);
                 return false;

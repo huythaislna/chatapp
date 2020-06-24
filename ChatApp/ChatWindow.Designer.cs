@@ -125,7 +125,7 @@
             this.exit_pt.Size = new System.Drawing.Size(57, 62);
             this.exit_pt.TabIndex = 7;
             this.exit_pt.TabStop = false;
-            this.exit_pt.Click += new System.EventHandler(this.pictureBox2_Click);
+            this.exit_pt.Click += new System.EventHandler(this.exit_bt_Click);
             // 
             // ChatWindow
             // 

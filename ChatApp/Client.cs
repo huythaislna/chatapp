@@ -83,6 +83,7 @@ namespace ChatApp
                 if (message.StartsWith(loginSuccessHeader))
                 {
                     username = user_tb.Text;
+                    error_lb.Text = "";
                     client_control.SelectedIndex = 1;
                 }
                 else if (message.StartsWith(loginFailHeader))
@@ -100,7 +101,6 @@ namespace ChatApp
                 else if (message.StartsWith("Sign up successful!"))
                 {
                     MessageBox.Show(message);
-                    //TcpClient.Client.Shutdown(SocketShutdown.Receive);
                     client_control.SelectedIndex = 0;
                 }
                 else if (message.StartsWith("Password is invalid"))
@@ -119,6 +119,8 @@ namespace ChatApp
                 {
                     room_id = Join_tb.Text;
                     room_name = message.Replace(joinSuccessHeader, "");
+                    Join_tb.Text = "";
+                    error_id_lb.Text = "";
                     ChatWindow cw = new ChatWindow();
                     cw.Show();
                 }
@@ -142,6 +144,8 @@ namespace ChatApp
             catch
             {
                 MessageBox.Show("Get an unexpected error! Try again later");
+                client.Close();
+                stream.Close();
                 this.Close();
                 return;
             }
@@ -295,6 +299,8 @@ namespace ChatApp
         }
 
 
+
+        //enter event
         private void username_tb_Enter(object sender, EventArgs e)
         {
             username_error_lb.Text = "";
@@ -314,6 +320,8 @@ namespace ChatApp
         {
             pw2_error_lb.Text = "";
         }
+       
+
         private void signup_btn_Click_1(object sender, EventArgs e)
         {
 

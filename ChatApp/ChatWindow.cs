@@ -107,26 +107,6 @@ namespace ChatApp
                     {
                         
                         message = message.Replace(chatHeader, "");
-                        //for (int i = 0; i < message.Length; i += 45)
-                        //{
-                        //    int numberCharInLine = 45;
-                        //    string partialMessage;
-                        //    try
-                        //    {
-                        //        while (message[i + numberCharInLine] != ' ')
-                        //        {
-                        //            numberCharInLine--;
-                        //        }
-                        //        partialMessage = message.Substring(i, numberCharInLine);
-                        //    }
-                        //    catch
-                        //    {
-                        //        partialMessage = message.Substring(i, message.Length - i);
-                        //    }
-                        //    chat_lw.Items.Add(partialMessage);
-                        //    int visibleItems = chat_lw.ClientSize.Height / chat_lw.ItemHeight;
-                        //    chat_lw.TopIndex = Math.Max(chat_lw.Items.Count - visibleItems + 1, 0);
-                        //}
 
                         
                         while (message.Length != 0)
@@ -149,7 +129,10 @@ namespace ChatApp
                 catch
                 {
                     MessageBox.Show("Get an unexpected error! Try again later");
+                    client.Close();
+                    stream.Close();
                     this.Close();
+                    return;
                 }
             }
         }
@@ -164,6 +147,8 @@ namespace ChatApp
             catch
             {
                 MessageBox.Show("Get an unexpected error! Try again later");
+                client.Close();
+                stream.Close();
                 this.Close();
             }
         }
@@ -233,7 +218,7 @@ namespace ChatApp
 
         }
 
-        private void pictureBox2_Click(object sender, EventArgs e)
+        private void exit_bt_Click(object sender, EventArgs e)
         {
             SendData(outRoomHeader);
         }
