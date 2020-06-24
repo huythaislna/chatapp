@@ -16,6 +16,7 @@ using BCrypt.Net;
 using MongoDB.Driver.Core.Authentication;
 using System.Text.RegularExpressions;
 using static SERVER.Header;
+using static SERVER.KeyExchange;
 
 namespace SERVER
 {
@@ -101,7 +102,7 @@ namespace SERVER
         {
             TcpClient client = (TcpClient)Client;
             NetworkStream stream = client.GetStream();
-            SendData("Connected to server!", client);
+            SendData(EncryptMessage("Connected to server!", secretKey), client);
             while (true)
             {
                 if (stream.CanRead != true || stream.CanWrite != true) break;
@@ -113,7 +114,11 @@ namespace SERVER
                     //prcessing
                     string[] data = message.Split('|');
 
-
+                    //key exchange
+                    if (message.StartsWith(keyExchangeHeader))
+                    {
+                        secretKey = GenerateSecretKey(1, 2, 3, 4).ToString();
+                    }
                     //sign up
                     if (message.StartsWith(registerHeader))
                     {
@@ -361,6 +366,8 @@ namespace SERVER
             Console.WriteLine("Server: " + message);
             TcpClient client = clientObj as TcpClient;
             NetworkStream stream = client.GetStream();
+            if (!message.StartsWith(keyExchangeHeader))
+                message = EncryptMessage(message, secretKey);
             byte[] noti = Encoding.UTF8.GetBytes(message);
             stream.Write(noti, 0, noti.Length);
         }
@@ -372,6 +379,9 @@ namespace SERVER
             str.Read(buffer, 0, buffer.Length);
 
             string mess = Encoding.UTF8.GetString(buffer);
+            if (!mess.StartsWith(keyExchangeHeader)) {
+                mess = DecryptMessage(mess, secretKey);
+            }
             return mess;
 
         }

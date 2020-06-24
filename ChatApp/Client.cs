@@ -10,14 +10,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SERVER.Header;
+using static SERVER.KeyExchange;
 
 namespace ChatApp
 {
     public partial class Client : Form
     {
-        //header
-
-
         //stream and tcpClient for room
         public static TcpClient client = null;
         public static NetworkStream stream = null;
@@ -34,11 +32,14 @@ namespace ChatApp
         }
 
 
+
         //send a message
         private void SendData(string message)
         {
             try
             {
+                if (!message.StartsWith(keyExchangeHeader))
+                    message = EncryptMessage(message, secretKey);
                 byte[] outstream = Encoding.UTF8.GetBytes(message);
                 stream.Write(outstream, 0, outstream.Length);
             }
@@ -75,12 +76,23 @@ namespace ChatApp
                 stream.Read(instream, 0, bufferSize);
                 var message = Encoding.UTF8.GetString(instream);
 
+                //decrypt incoming message
+                if (!message.StartsWith(keyExchangeHeader))
+                    message = DecryptMessage(message, secretKey);
+
+
                 //process message
 
                 message = message.Substring(0, message.IndexOf('\0'));
 
+                //exchange key
+                if (message.StartsWith(keyExchangeHeader))
+                {
+                    secretKey = GenerateSecretKey(1, 2, 3, 4).ToString();
+                }
+
                 //login
-                if (message.StartsWith(loginSuccessHeader))
+                else if (message.StartsWith(loginSuccessHeader))
                 {
                     username = user_tb.Text;
                     error_lb.Text = "";

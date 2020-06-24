@@ -26,5 +26,26 @@ namespace SERVER
         public static string adminHeader = "admin3@##@##@a1";
         public static string signOutHeader = "Signout32k32lj32!!";
         public static string signOutSuccess = "Signoutsuccess328i28332!";
+        public static string keyExchangeHeader = "key1234523@@@@a!!!!";
+
+    }
+
+    class KeyExchange
+    {
+        //encrypt
+        public static string secretKey = "key";
+        public static string EncryptMessage(string message, string key)
+        {
+            return message;
+        }
+        //
+        public static string DecryptMessage(string message, string key)
+        {
+            return message;
+        }
+        public static int GenerateSecretKey(int p, int g, int privateKey, int publicKey)
+        {
+            return 0;
+        }
     }
 }

@@ -9,20 +9,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static ChatApp.Client;
+using static SERVER.KeyExchange;
+using static SERVER.Header;
 namespace ChatApp
 {
 
     public partial class createRoom : Form
     {
-        const string createHeader = "createabc##";
-        const string createRoomSuccess = "creakjkjtiejkjkj12jifasjfdk123123j";
-
         public createRoom()
         {
             InitializeComponent();
         }
         private void SendData(string message)
         {
+            message = EncryptMessage(message, secretKey);
             byte[] outstream = Encoding.UTF8.GetBytes(message);
             if (stream != null)
             {
@@ -39,6 +39,9 @@ namespace ChatApp
                 byte[] instream = new byte[bufferSize];
                 stream.Read(instream, 0, bufferSize);
                 var message = Encoding.UTF8.GetString(instream);
+                //encrypt
+
+                message = DecryptMessage(message, secretKey);
                 if (message.StartsWith(createRoomSuccess))
                 {                    
                     room_id_lb.Text = message.Remove(0, createRoomSuccess.Length);
@@ -68,7 +71,7 @@ namespace ChatApp
         {
             if (room_name_tb.Text != "")
             {
-                SendData(createHeader + "|" + room_name_tb.Text + "|");
+                SendData(createRoomHeader + "|" + room_name_tb.Text + "|");
                 ReceiveMessage();
             }
             else
@@ -81,7 +84,7 @@ namespace ChatApp
             {
                 if (room_name_tb.Text != "")
                 {
-                    SendData(createHeader + "|" + room_name_tb.Text + "|");
+                    SendData(createRoomHeader + "|" + room_name_tb.Text + "|");
                     ReceiveMessage();
 
                 }

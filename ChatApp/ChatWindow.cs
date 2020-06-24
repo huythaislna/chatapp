@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SERVER.Header;
+using static SERVER.KeyExchange;
 
 namespace ChatApp
 {
@@ -66,6 +67,7 @@ namespace ChatApp
                     byte[] instream = new byte[bufferSize];
                     stream.Read(instream, 0, bufferSize);
                     string message = Encoding.UTF8.GetString(instream);
+                    message = DecryptMessage(message, secretKey);
                     stream.Flush();
 
                     //process message
@@ -141,6 +143,7 @@ namespace ChatApp
         {
             try
             {
+                message = EncryptMessage(message, secretKey);
                 byte[] outstream = Encoding.UTF8.GetBytes(message);
                 stream.Write(outstream, 0, outstream.Length);
             }
