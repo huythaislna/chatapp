@@ -67,12 +67,11 @@ namespace ChatApp
                     byte[] instream = new byte[bufferSize];
                     stream.Read(instream, 0, bufferSize);
                     string message = Encoding.UTF8.GetString(instream);
+                    message = message.Substring(0, message.IndexOf("\0\0\0\0\0"));
                     message = DecryptMessage(message, secretKey);
                     stream.Flush();
 
                     //process message
-
-                    message = message.Substring(0, message.IndexOf("\0"));
                     //update members in room
                     if (message.StartsWith(updateMemberHeader))
                     {

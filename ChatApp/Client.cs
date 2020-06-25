@@ -38,6 +38,7 @@ namespace ChatApp
         {
             try
             {
+                Console.WriteLine("Client-send: " + message);
                 if (!message.StartsWith(keyExchangeHeader))
                     message = EncryptMessage(message, secretKey);
                 byte[] outstream = Encoding.UTF8.GetBytes(message);
@@ -75,24 +76,36 @@ namespace ChatApp
                 byte[] instream = new byte[bufferSize];
                 stream.Read(instream, 0, bufferSize);
                 var message = Encoding.UTF8.GetString(instream);
+                Console.WriteLine("Client-receive: " + message);
 
+                //message = message.Substring(0, message.IndexOf('\0'));
+                message = message.Substring(0, message.IndexOf("\0\0\0\0\0"));
                 //decrypt incoming message
                 if (!message.StartsWith(keyExchangeHeader))
-                    message = DecryptMessage(message, secretKey);
+                {
+                    message = EncryptMessage(message, secretKey);
+                    Console.WriteLine("Client" + message);
+                }
+                else
+                {
+                    string[] keys = message.Split('|');
+                    int prime = Int32.Parse(keys[1]);
+                    int primmitiveRoot = Int32.Parse(keys[2]);
+                    privateKey = generatePrivateKey(prime);
+                    int publicKeyOfServer = Int32.Parse(keys[3]);
+                    secretKey = GenerateSecretKey(prime, privateKey, publicKeyOfServer);
+                    Console.WriteLine("Client secretkey: " + secretKey);
+                    SendData(keyExchangeHeader + "|" + generatePublicKey(prime, primmitiveRoot, privateKey));
+                }
 
 
                 //process message
 
-                message = message.Substring(0, message.IndexOf('\0'));
 
                 //exchange key
-                if (message.StartsWith(keyExchangeHeader))
-                {
-                    secretKey = GenerateSecretKey(1, 2, 3, 4).ToString();
-                }
 
                 //login
-                else if (message.StartsWith(loginSuccessHeader))
+                if (message.StartsWith(loginSuccessHeader))
                 {
                     username = user_tb.Text;
                     error_lb.Text = "";

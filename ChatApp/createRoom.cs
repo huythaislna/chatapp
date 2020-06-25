@@ -39,8 +39,8 @@ namespace ChatApp
                 byte[] instream = new byte[bufferSize];
                 stream.Read(instream, 0, bufferSize);
                 var message = Encoding.UTF8.GetString(instream);
-                //encrypt
-
+                //decrypt
+                message = message.Substring(0, message.IndexOf("\0\0\0\0\0"));
                 message = DecryptMessage(message, secretKey);
                 if (message.StartsWith(createRoomSuccess))
                 {                    

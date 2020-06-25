@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,19 +35,62 @@ namespace SERVER
     class KeyExchange
     {
         //encrypt
-        public static string secretKey = "key";
-        public static string EncryptMessage(string message, string key)
+        public static int secretKey = 0;
+        public static int privateKey = 0;
+        public static int publicKey = 0;
+        public static string XORCipher(string data, string key)
         {
-            return message;
+            int dataLen = data.Length;
+            int keyLen = key.Length;
+            char[] output = new char[dataLen];
+
+            for (int i = 0; i < dataLen; ++i)
+            {
+                output[i] = (char)(data[i] ^ key[i % keyLen]);
+            }
+
+            Console.WriteLine("Xor-Client: " + new string(output));
+            return new string(output);
+        }
+        public static string EncryptMessage(string plainText, int key)
+        {
+            return XORCipher(plainText, key.ToString());
+            //return plainText;
         }
         //
-        public static string DecryptMessage(string message, string key)
+        public static string DecryptMessage(string plainText, int key)
         {
-            return message;
+            return XORCipher(plainText, key.ToString());
+            //return message;
         }
-        public static int GenerateSecretKey(int p, int g, int privateKey, int publicKey)
+        public static int GenerateSecretKey(int p, int privateKey, int publicKey)
         {
-            return 0;
+            int K = mod_define(publicKey, privateKey, p);
+            return K;
+        }
+        static public int generatePrivateKey(int p)
+        {
+            Random rnd = new Random();
+            int a = rnd.Next(p - 1);
+            return a;
+        }
+        static int mod_define(int x, int y, int p)
+        {
+            int res = 1;
+            while (y > 0)
+            {
+                if (y % 2 != 0)
+                    res = (res * x) % p;
+                y = y / 2;
+                x = (x * x) % p;
+
+            }
+            return res;
+        }
+        static public int generatePublicKey(int p, int g, int a)
+        {
+            int A = mod_define(g, a, p);
+            return A;
         }
     }
 }

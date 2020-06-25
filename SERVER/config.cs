@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;       
+using System.Threading.Tasks;
+using System.Security.Cryptography;
+using System.IO;
+using System.Windows.Forms;
 
 namespace SERVER
 {
@@ -32,14 +35,29 @@ namespace SERVER
     class KeyExchange
     {
         //encrypt
-        public static string secretKey = "key";
-        public static string EncryptMessage(string message, string key)
+        public static int secretKey = 0;
+        public static string XORCipher(string data, string key)
         {
-            return message;
+            int dataLen = data.Length;
+            int keyLen = key.Length;
+            char[] output = new char[dataLen];
+
+            for (int i = 0; i < dataLen; ++i)
+            {
+                output[i] = (char)(data[i] ^ key[i % keyLen]);
+            }
+            Console.WriteLine("Xor: " + new string(output));
+            return new string(output);
         }
-        public static string DecryptMessage(string message, string key)
+        public static string EncryptMessage(string plainText, int key)
         {
-            return message;
+            return XORCipher(plainText, key.ToString());
+            //return plainText;
+        }
+        public static string DecryptMessage(string plainText, int key)
+        {
+            return XORCipher(plainText, key.ToString());
+            //return message;
         }
 
         //Tham so truyen vao:
@@ -47,7 +65,7 @@ namespace SERVER
         //g = findPrimitive(p);
         //privateKey = generatePrivateKey(p)
         //publicKey la cai nhan tu ben kia
-        public static int GenerateSecretKey(int p, int g, int privateKey, int publicKey)
+        public static int GenerateSecretKey(int p, int privateKey, int publicKey)
         {
 
             int K = mod_define(publicKey, privateKey, p);
@@ -145,7 +163,7 @@ namespace SERVER
         }
 
         // Function to find smallest primitive root of n 
-        static int findPrimitive(int n)
+        public static int findPrimitive(int n)
         {
             HashSet<int> s = new HashSet<int>();
 

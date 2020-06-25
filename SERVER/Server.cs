@@ -15,6 +15,7 @@ using MongoDB.Driver;
 using BCrypt.Net;
 using MongoDB.Driver.Core.Authentication;
 using System.Text.RegularExpressions;
+using System.Security.Cryptography;
 using static SERVER.Header;
 using static SERVER.KeyExchange;
 
@@ -102,25 +103,29 @@ namespace SERVER
         {
             TcpClient client = (TcpClient)Client;
             NetworkStream stream = client.GetStream();
-            SendData(EncryptMessage("Connected to server!", secretKey), client);
+            //SendData(EncryptMessage("Connected to server!", secretKey), client);
+            int prime = generatePrimeNumber(16);
+            int primmitiveRoot = findPrimitive(prime);
+            int privateKey = generatePrivateKey(prime);
+            int publicKey = generatePublicKey(prime, primmitiveRoot, privateKey);
+            SendData(keyExchangeHeader + "|" + prime + "|" + primmitiveRoot + "|" + publicKey + "|", client);
             while (true)
             {
                 if (stream.CanRead != true || stream.CanWrite != true) break;
-                try
-                {
+                //try
+                //{
                     string message = ReceiveData(stream, client);
-                    message = message.Substring(0, message.IndexOf('\0'));
-
                     //prcessing
                     string[] data = message.Split('|');
 
                     //key exchange
                     if (message.StartsWith(keyExchangeHeader))
                     {
-                        secretKey = GenerateSecretKey(1, 2, 3, 4).ToString();
+                        secretKey = GenerateSecretKey(prime, privateKey, Int32.Parse(data[1]));
+                        Console.WriteLine("sERVER KEY: " + secretKey);
                     }
                     //sign up
-                    if (message.StartsWith(registerHeader))
+                    else if (message.StartsWith(registerHeader))
                     {
                         register(data[1], data[2], data[3], client);
                     }
@@ -241,13 +246,13 @@ namespace SERVER
                         }
                         catch { }
                     }
-                }
-                catch
-                {
-                    client.Close();
-                    stream.Close();
-                    return;
-                }
+                //}
+                //catch
+                //{
+                //    client.Close();
+                //    stream.Close();
+                //    return;
+                //}
             }
 
         }
@@ -363,11 +368,11 @@ namespace SERVER
         //send a message
         private void SendData(string message, object clientObj)
         {
-            Console.WriteLine("Server: " + message);
             TcpClient client = clientObj as TcpClient;
             NetworkStream stream = client.GetStream();
             if (!message.StartsWith(keyExchangeHeader))
                 message = EncryptMessage(message, secretKey);
+            Console.WriteLine("Server-send: " + message);
             byte[] noti = Encoding.UTF8.GetBytes(message);
             stream.Write(noti, 0, noti.Length);
         }
@@ -377,12 +382,15 @@ namespace SERVER
         {
             byte[] buffer = new byte[client.ReceiveBufferSize];
             str.Read(buffer, 0, buffer.Length);
-
-            string mess = Encoding.UTF8.GetString(buffer);
-            if (!mess.StartsWith(keyExchangeHeader)) {
-                mess = DecryptMessage(mess, secretKey);
+            string message = Encoding.UTF8.GetString(buffer);
+            Console.WriteLine("Server-Received: " + message);
+            message = message.Substring(0, message.IndexOf("\0\0\0\0\0"));
+            Console.WriteLine("Server" + message);
+            if (!message.StartsWith(keyExchangeHeader)) {
+                message = EncryptMessage(message, secretKey);
             }
-            return mess;
+            Console.WriteLine("Server" + message);
+            return message;
 
         }
         private void start_btn_Click(object sender, EventArgs e)
@@ -393,10 +401,19 @@ namespace SERVER
             power_lb.Text = "ON";
             power_lb.ForeColor = System.Drawing.Color.Green;
         }
-
         private void Server_Load(object sender, EventArgs e)
         {
-            //Setup();
+            ////Setup();
+            //var alice = ECDiffieHellman.Create();
+            //var bob = ECDiffieHellman.Create();
+
+            //var aliceSharedSecret = alice.DeriveKeyMaterial(bob.PublicKey);
+            //var bobSharedSecret = bob.DeriveKeyMaterial(alice.PublicKey);
+            //ulong i = BitConverter.ToUInt64(aliceSharedSecret, 0);
+            //Console.WriteLine("int: {0}", i);
+
+            //ulong j = BitConverter.ToUInt64(bobSharedSecret, 0);
+            //Console.WriteLine("int: {0}", i=j);
         }
     }
 }
