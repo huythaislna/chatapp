@@ -10,12 +10,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SERVER.Header;
-using static SERVER.KeyExchange;
+using static SERVER.RSA;
 
 namespace ChatApp
 {
     public partial class Client : Form
     {
+        //header
+
+
         //stream and tcpClient for room
         public static TcpClient client = null;
         public static NetworkStream stream = null;
@@ -32,17 +35,24 @@ namespace ChatApp
         }
 
 
-
         //send a message
         private void SendData(string message)
         {
             try
             {
-                Console.WriteLine("Client-send: " + message);
-                if (!message.StartsWith(keyExchangeHeader))
-                    message = EncryptMessage(message, secretKey);
-                byte[] outstream = Encoding.UTF8.GetBytes(message);
-                stream.Write(outstream, 0, outstream.Length);
+                if (! message.StartsWith(keyExchangeHeader))
+                {
+                message = Encrypt(message, serverPublicKey);
+                }
+                byte[] length = Encoding.UTF8.GetBytes(message.Length.ToString());
+                byte[] lengthHeader = new byte[10];
+                length.CopyTo(lengthHeader, 0);
+                byte[] noti = Encoding.UTF8.GetBytes(message);
+                //stream.Write(noti, 0, noti.Length);
+                byte[] sentData = new byte[10 + noti.Length];
+                lengthHeader.CopyTo(sentData, 0);
+                noti.CopyTo(sentData, 10);
+                stream.Write(sentData, 0, sentData.Length);
             }
             catch
             {
@@ -58,11 +68,9 @@ namespace ChatApp
                 CheckForIllegalCrossThreadCalls = false;
                 client = new TcpClient();
                 client.Connect(serverIpAddress, serverPort);
-                Console.WriteLine("Client - ket noi den Server");
                 stream = client.GetStream();
                 Thread listen = new Thread(listenToServer);
                 listen.Start();
-
             }
             catch
             {
@@ -78,39 +86,22 @@ namespace ChatApp
                 byte[] instream = new byte[bufferSize];
                 stream.Read(instream, 0, bufferSize);
                 var message = Encoding.UTF8.GetString(instream);
-                Console.WriteLine("Tin nhan nhan duoc tu Server: " + message);
-
-                //message = message.Substring(0, message.IndexOf('\0'));
-                message = message.Substring(0, message.IndexOf("\0\0\0\0\0"));
-                //decrypt incoming message
-                if (!message.StartsWith(keyExchangeHeader))
-                {
-                    message = DecryptMessage(message, secretKey);
-                    Console.WriteLine("Tin nhan sau khi Decrypt: " + message);
-                }
-                else
-                {
-                    string[] keys = message.Split('|');
-                    int prime = Int32.Parse(keys[1]);
-                    int primmitiveRoot = Int32.Parse(keys[2]);
-                    privateKey = generatePrivateKey(prime);
-                    Console.WriteLine("Client tao privatekey: " + privateKey);
-                    int publicKeyOfServer = Int32.Parse(keys[3]);
-                    publicKey = generatePublicKey(prime, primmitiveRoot, privateKey);
-                    Console.WriteLine("Client tinh publickey = " + publicKey);
-                    secretKey = GenerateSecretKey(prime, privateKey, publicKeyOfServer);
-                    Console.WriteLine("Client tinh secretkey = " + secretKey);
-                    Console.WriteLine("Client gui client publickey = " + publicKey + " cho Server");
-                    SendData(keyExchangeHeader + "|" + publicKey);
-                }
-
 
                 //process message
 
-
-                //exchange key
+                //message = message.Substring(0, message.IndexOf('\0'));
+                int length = Int32.Parse(message.Substring(0, 10));
+                Console.WriteLine("Client-received:" + message);
+                message = message.Substring(10, length);
+                if (!message.StartsWith(keyExchangeHeader)) message = Decrypt(message, privateKeyString);
+                Console.WriteLine("Client-decrypt: " + message);
 
                 //login
+                if (message.StartsWith(keyExchangeHeader))
+                {
+                    serverPublicKey = message.Split('|')[1];
+                    SendData(keyExchangeHeader + "|" + publicKeyString);
+                }
                 if (message.StartsWith(loginSuccessHeader))
                 {
                     username = user_tb.Text;

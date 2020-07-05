@@ -9,26 +9,35 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static ChatApp.Client;
-using static SERVER.KeyExchange;
+using static SERVER.RSA;
 using static SERVER.Header;
 namespace ChatApp
 {
 
     public partial class createRoom : Form
     {
+        const string createHeader = "createabc##";
+        const string createRoomSuccess = "creakjkjtiejkjkj12jifasjfdk123123j";
+
         public createRoom()
         {
             InitializeComponent();
         }
         private void SendData(string message)
         {
-            message = EncryptMessage(message, secretKey);
-            byte[] outstream = Encoding.UTF8.GetBytes(message);
-            if (stream != null)
+            if (!message.StartsWith(keyExchangeHeader))
             {
-                stream.Write(outstream, 0, outstream.Length);
-                stream.Flush();
+                message = Encrypt(message, serverPublicKey);
             }
+            byte[] length = Encoding.UTF8.GetBytes(message.Length.ToString());
+            byte[] lengthHeader = new byte[10];
+            length.CopyTo(lengthHeader, 0);
+            byte[] noti = Encoding.UTF8.GetBytes(message);
+            //stream.Write(noti, 0, noti.Length);
+            byte[] sentData = new byte[10 + noti.Length];
+            lengthHeader.CopyTo(sentData, 0);
+            noti.CopyTo(sentData, 10);
+            stream.Write(sentData, 0, sentData.Length);
         }
         private void ReceiveMessage()
         {
@@ -39,9 +48,14 @@ namespace ChatApp
                 byte[] instream = new byte[bufferSize];
                 stream.Read(instream, 0, bufferSize);
                 var message = Encoding.UTF8.GetString(instream);
-                //decrypt
-                message = message.Substring(0, message.IndexOf("\0\0\0\0\0"));
-                message = DecryptMessage(message, secretKey);
+
+                int length = Int32.Parse(message.Substring(0, 10));
+                Console.WriteLine("Client-received:" + message);
+                message = message.Substring(10, length);
+                if (!message.StartsWith(keyExchangeHeader)) message = Decrypt(message, privateKeyString);
+                Console.WriteLine("Client-decrypt: " + message);
+
+
                 if (message.StartsWith(createRoomSuccess))
                 {                    
                     room_id_lb.Text = message.Remove(0, createRoomSuccess.Length);
@@ -71,7 +85,7 @@ namespace ChatApp
         {
             if (room_name_tb.Text != "")
             {
-                SendData(createRoomHeader + "|" + room_name_tb.Text + "|");
+                SendData(createHeader + "|" + room_name_tb.Text + "|");
                 ReceiveMessage();
             }
             else
@@ -84,7 +98,7 @@ namespace ChatApp
             {
                 if (room_name_tb.Text != "")
                 {
-                    SendData(createRoomHeader + "|" + room_name_tb.Text + "|");
+                    SendData(createHeader + "|" + room_name_tb.Text + "|");
                     ReceiveMessage();
 
                 }

@@ -15,9 +15,9 @@ using MongoDB.Driver;
 using BCrypt.Net;
 using MongoDB.Driver.Core.Authentication;
 using System.Text.RegularExpressions;
-using System.Security.Cryptography;
 using static SERVER.Header;
-using static SERVER.KeyExchange;
+using static SERVER.RSA;
+using System.Security.Cryptography;
 
 namespace SERVER
 {
@@ -32,6 +32,8 @@ namespace SERVER
             public string Room_id { get; set; }
 
             public string Room_name { get; set; }
+
+            public string Client_public_key { get; set; }
 
         }
 
@@ -103,39 +105,31 @@ namespace SERVER
         {
             TcpClient client = (TcpClient)Client;
             NetworkStream stream = client.GetStream();
-            //SendData(EncryptMessage("Connected to server!", secretKey), client);
-
-            int prime = generatePrimeNumber(16);
-            Console.WriteLine("Server tao p : " + prime);
-            int primmitiveRoot = findPrimitive(prime);
-            Console.WriteLine("Server tao g : " + primmitiveRoot);
-            int privateKey = generatePrivateKey(prime);
-            Console.WriteLine("Server tao privatekey : " + privateKey);
-            int publicKey = generatePublicKey(prime, primmitiveRoot, privateKey);
-            Console.WriteLine("Server tinh publickey = " + publicKey);
-            Console.WriteLine("Server yeu cau trao doi public key, gui p = " + prime + " g = " + primmitiveRoot + " server publickey = " + publicKey + " cho Client");
-
-            SendData(keyExchangeHeader + "|" + prime + "|" + primmitiveRoot + "|" + publicKey + "|", client);
+            //SendData("Connected to server!", client);
+            string clientPublicKey = "";
+            SendData(keyExchangeHeader + "|" + publicKeyString, client);
             while (true)
             {
                 if (stream.CanRead != true || stream.CanWrite != true) break;
                 try
                 {
                     string message = ReceiveData(stream, client);
+                    int length = Int32.Parse(message.Substring(0, 10));
+                    message = message.Substring(10, length);
+                    Console.WriteLine("Server-received: " + message);
+                    if (!message.StartsWith(keyExchangeHeader)) message = Decrypt(message, privateKeyString);
+                    Console.WriteLine("Server-decrypt: " + message);
                     //prcessing
                     string[] data = message.Split('|');
 
-                    //key exchange
                     if (message.StartsWith(keyExchangeHeader))
                     {
-                        secretKey = GenerateSecretKey(prime, privateKey, Int32.Parse(data[1]));
-                    Console.WriteLine("Server nhan duoc client publickey = " + data[1]  );
-                    Console.WriteLine("Server tinh Secretkey = " + secretKey);
+                        clientPublicKey = data[1];
                     }
                     //sign up
                     else if (message.StartsWith(registerHeader))
                     {
-                        register(data[1], data[2], data[3], client);
+                        register(data[1], data[2], data[3], clientPublicKey, client);
                     }
                     //login
                     else if (message.StartsWith(loginHeader))
@@ -145,17 +139,20 @@ namespace SERVER
                         {
                             if (user.Key == data[1])
                             {
-                                SendData(loginFailHeader + "This account have been being used", client);
+                                SendData(Encrypt(loginFailHeader + "This account have been being used", clientPublicKey), client);
                                 isUsed = true;
                                 break;
                             }
                         }
-                        if (authenticate(data[1], data[2]) == true && isUsed == false)
+                        if (isUsed == false)
                         {
-                            SendData(loginSuccessHeader, client);
-                            signedInUsers.Add(data[1], client);
+                            if (authenticate(data[1], data[2]) == true)
+                            {
+                                SendData(Encrypt(loginSuccessHeader, clientPublicKey), client);
+                                signedInUsers.Add(data[1], client);
+                            }
+                            else SendData(Encrypt(loginFailHeader + "Username or Password was wrong", clientPublicKey), client);
                         }
-                        else SendData(loginFailHeader + "Username or Password was wrong", client);
                     }
                     //signout
                     else if (message.StartsWith(signOutHeader))
@@ -165,10 +162,10 @@ namespace SERVER
                         {
                             if (user.Username == data[1])
                             {
-                                SendData(signOutHeader, user.UserConnection);
+                                SendData(Encrypt(signOutHeader, clientPublicKey), user.UserConnection);
                             }
                         }
-                        SendData(signOutSuccess, client);
+                        SendData(Encrypt(signOutSuccess, clientPublicKey), client);
                         client.Close();
                         stream.Close();
                     }
@@ -183,7 +180,7 @@ namespace SERVER
                                 { "id",  room_id},
                                 { "name",  data[1]},
                         });
-                        SendData(createRoomSuccess + room_id, client);
+                        SendData(Encrypt(createRoomSuccess + room_id, clientPublicKey), client);
                     }
                     //start chat - initial user 
                     else if (message.StartsWith(startChatSession))
@@ -194,10 +191,11 @@ namespace SERVER
                             Username = data[1],
                             Display_name = get_display_name(data[1]),
                             Room_id = data[2],
-                            Room_name = getRoomName(data[2])
+                            Room_name = getRoomName(data[2]),
+                            Client_public_key = clientPublicKey
                         };
                         sendToRoom(adminHeader + "Admin: " + user.Display_name + " joined !!", user.Room_id);
-                        SendData(adminHeader + "Admin: Welcome! " + user.Display_name, client);
+                        SendData(Encrypt(adminHeader + "Admin: Welcome! " + user.Display_name, clientPublicKey), client);
                         usersInRoom.Add(user);
                         updateMember(client);
                     }
@@ -216,15 +214,15 @@ namespace SERVER
                         {
                             if (checkUserInRoom(data[1], data[2]) == false)
                             {
-                                SendData(joinSuccessHeader + getRoomName(data[1]), client);
+                                SendData(Encrypt(joinSuccessHeader + getRoomName(data[1]), clientPublicKey), client);
                             } else
                             {
-                                SendData(errorHeader + "You have already been in room", client);
+                                SendData(Encrypt(errorHeader + "You have already been in room", clientPublicKey), client);
                             }
                         }
                         else
                         {
-                            SendData(errorHeader + "Room is not existed", client);
+                            SendData(Encrypt(errorHeader + "Room is not existed", clientPublicKey), client);
                         }
                     }
                     //update members
@@ -238,7 +236,7 @@ namespace SERVER
                     {
                         try
                         {
-                            SendData(outSuccessHeader, client);
+                            SendData(Encrypt(outSuccessHeader,clientPublicKey), client);
                             var user = getUser(client);
                             usersInRoom.Remove(user);
                             sendToRoom(adminHeader + "Admin: " + user.Display_name + " left!!", user.Room_id);
@@ -254,14 +252,14 @@ namespace SERVER
                         }
                         catch { }
                     }
-            }
+                }
                 catch
-            {
-                client.Close();
-                stream.Close();
-                return;
+                {
+                    client.Close();
+                    stream.Close();
+                    return;
+                }
             }
-        }
 
         }
 
@@ -297,7 +295,7 @@ namespace SERVER
             {
                 if (user.Room_id == room_id)
                 {
-                    SendData(message, user.UserConnection);
+                    SendData(Encrypt(message, user.Client_public_key), user.UserConnection);
                 }
             }
         }
@@ -335,7 +333,7 @@ namespace SERVER
             return isMatchPwd;
         }
 
-        private bool register(string name, string username, string pwd, TcpClient client)
+        private bool register(string name, string username, string pwd, string clientPublicKey, TcpClient client)
         {
             // return true
             var usernameRegex = new Regex(@"[a-z\d]{6,15}");
@@ -347,19 +345,19 @@ namespace SERVER
             var firstDocument = usersCollection.Find(Builders<BsonDocument>.Filter.Eq("username", username)).FirstOrDefault();
             if (firstDocument != null)
             {
-                SendData("Username is existed!", client);
+                SendData(Encrypt("Username is existed!", clientPublicKey), client);
                 return false;
             }
             if (usernameRegex.IsMatch(username) == false || 
                 hasUpperChar.IsMatch(username) == true)
             {
-                SendData("Username is invalid!", client);
+                SendData(Encrypt("Username is invalid!", clientPublicKey), client);
                 return false;
             }
             if ((hasNumber.IsMatch(pwd) && hasUpperChar.IsMatch(pwd) && 
                 hasMiniMaxChars.IsMatch(pwd) && hasLowerChar.IsMatch(pwd)) == false) 
             {
-                SendData("Password is invalid!", client);
+                SendData(Encrypt("Password is invalid!", clientPublicKey), client);
                 return false;
             }
             usersCollection.InsertOne(
@@ -369,20 +367,26 @@ namespace SERVER
                     { "password", BCrypt.Net.BCrypt.HashPassword(pwd)}
                 }
             );
-            SendData("Sign up successful!", client);
+            SendData(Encrypt("Sign up successful!", clientPublicKey), client);
             return true;
         }
 
         //send a message
         private void SendData(string message, object clientObj)
         {
+            Console.WriteLine("Server-send: " + message);
             TcpClient client = clientObj as TcpClient;
             NetworkStream stream = client.GetStream();
-            if (!message.StartsWith(keyExchangeHeader))
-                message = EncryptMessage(message, secretKey);
-            Console.WriteLine("Server-send: " + message);
+            //length
+            byte[] length = Encoding.UTF8.GetBytes(message.Length.ToString());
+            byte[] lengthHeader = new byte[10];
+            length.CopyTo(lengthHeader, 0);
             byte[] noti = Encoding.UTF8.GetBytes(message);
-            stream.Write(noti, 0, noti.Length);
+            //stream.Write(noti, 0, noti.Length);
+            byte[] sentData = new byte[10 + noti.Length];
+            lengthHeader.CopyTo(sentData, 0);
+            noti.CopyTo(sentData, 10);
+            stream.Write(sentData, 0, sentData.Length);
         }
 
         //get message from client
@@ -390,15 +394,9 @@ namespace SERVER
         {
             byte[] buffer = new byte[client.ReceiveBufferSize];
             str.Read(buffer, 0, buffer.Length);
-            string message = Encoding.UTF8.GetString(buffer);
-            Console.WriteLine("Server-Received: " + message);
-            message = message.Substring(0, message.IndexOf("\0\0\0\0\0"));
-            Console.WriteLine("Tin nhan nhan duoc tu client: " + message);
-            if (!message.StartsWith(keyExchangeHeader)) {
-                message = DecryptMessage(message, secretKey);
-            }
-            Console.WriteLine("Tin nhan sau khi decrypt: " + message);
-            return message;
+
+            string mess = Encoding.UTF8.GetString(buffer);
+            return mess;
 
         }
         private void start_btn_Click(object sender, EventArgs e)
@@ -409,19 +407,11 @@ namespace SERVER
             power_lb.Text = "ON";
             power_lb.ForeColor = System.Drawing.Color.Green;
         }
+
         private void Server_Load(object sender, EventArgs e)
         {
-            ////Setup();
-            //var alice = ECDiffieHellman.Create();
-            //var bob = ECDiffieHellman.Create();
-
-            //var aliceSharedSecret = alice.DeriveKeyMaterial(bob.PublicKey);
-            //var bobSharedSecret = bob.DeriveKeyMaterial(alice.PublicKey);
-            //ulong i = BitConverter.ToUInt64(aliceSharedSecret, 0);
-            //Console.WriteLine("int: {0}", i);
-
-            //ulong j = BitConverter.ToUInt64(bobSharedSecret, 0);
-            //Console.WriteLine("int: {0}", i=j);
+            //Setup();
         }
+
     }
 }

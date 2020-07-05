@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -28,68 +27,68 @@ namespace SERVER
         public static string adminHeader = "admin3@##@##@a1";
         public static string signOutHeader = "Signout32k32lj32!!";
         public static string signOutSuccess = "Signoutsuccess328i28332!";
-        public static string keyExchangeHeader = "key1234523@@@@a!!!!";
-
+        public static string keyExchangeHeader = "keyexchange123#######";
     }
 
-    class KeyExchange
+    class RSA
     {
-        //encrypt
-        public static int secretKey = 0;
-        public static int privateKey = 0;
-        public static int publicKey = 0;
-        public static string XORCipher(string data, string key)
-        {
-            int dataLen = data.Length;
-            int keyLen = key.Length;
-            char[] output = new char[dataLen];
+        public static RSACryptoServiceProvider cryptoServiceProvider = new RSACryptoServiceProvider(2048); //2048 - Długość klucza
+        public static RSAParameters privateKey = cryptoServiceProvider.ExportParameters(true); //Generowanie klucza prywatnego
+        public static RSAParameters publicKey = cryptoServiceProvider.ExportParameters(false);
+        public static string publicKeyString = GetKeyString(publicKey);
+        public static string privateKeyString = GetKeyString(privateKey);
+        public static string serverPublicKey = "";
 
-            for (int i = 0; i < dataLen; ++i)
-            {
-                output[i] = (char)(data[i] ^ key[i % keyLen]);
-            }
-            
-            return new string(output);
-        }
-        public static string EncryptMessage(string plainText, int key)
+        public static string Encrypt(string textToEncrypt, string publicKeyString)
         {
-            return XORCipher(plainText, key.ToString());
-            //return plainText;
-        }
-        //
-        public static string DecryptMessage(string plainText, int key)
-        {
-            return XORCipher(plainText, key.ToString());
-            //return message;
-        }
-        public static int GenerateSecretKey(int p, int privateKey, int publicKey)
-        {
-            int K = mod_define(publicKey, privateKey, p);
-            return K;
-        }
-        static public int generatePrivateKey(int p)
-        {
-            Random rnd = new Random(p*100);
-            int a = rnd.Next(p - 1);
-            return a;
-        }
-        static int mod_define(int x, int y, int p)
-        {
-            int res = 1;
-            while (y > 0)
-            {
-                if (y % 2 != 0)
-                    res = (res * x) % p;
-                y = y / 2;
-                x = (x * x) % p;
+            var bytesToEncrypt = Encoding.UTF8.GetBytes(textToEncrypt);
 
+            using (var rsa = new RSACryptoServiceProvider(2048))
+            {
+                try
+                {
+                    rsa.FromXmlString(publicKeyString);
+                    var encryptedData = rsa.Encrypt(bytesToEncrypt, true);
+                    var base64Encrypted = Convert.ToBase64String(encryptedData);
+                    return base64Encrypted;
+                }
+                finally
+                {
+                    rsa.PersistKeyInCsp = false;
+                }
             }
-            return res;
         }
-        static public int generatePublicKey(int p, int g, int a)
+
+        public static string GetKeyString(RSAParameters publicKey)
         {
-            int A = mod_define(g, a, p);
-            return A;
+            var stringWriter = new System.IO.StringWriter();
+            var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+            xmlSerializer.Serialize(stringWriter, publicKey);
+            return stringWriter.ToString();
+        }
+
+        public static string Decrypt(string textToDecrypt, string privateKeyString)
+        {
+            var bytesToDescrypt = Encoding.UTF8.GetBytes(textToDecrypt);
+
+            using (var rsa = new RSACryptoServiceProvider(2048))
+            {
+                try
+                {
+
+                    // server decrypting data with private key                    
+                    rsa.FromXmlString(privateKeyString);
+
+                    var resultBytes = Convert.FromBase64String(textToDecrypt);
+                    var decryptedBytes = rsa.Decrypt(resultBytes, true);
+                    var decryptedData = Encoding.UTF8.GetString(decryptedBytes);
+                    return decryptedData.ToString();
+                }
+                finally
+                {
+                    rsa.PersistKeyInCsp = false;
+                }
+            }
         }
     }
 }
