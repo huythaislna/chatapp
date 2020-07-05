@@ -104,16 +104,23 @@ namespace SERVER
             TcpClient client = (TcpClient)Client;
             NetworkStream stream = client.GetStream();
             //SendData(EncryptMessage("Connected to server!", secretKey), client);
+
             int prime = generatePrimeNumber(16);
+            Console.WriteLine("Server tao p : " + prime);
             int primmitiveRoot = findPrimitive(prime);
+            Console.WriteLine("Server tao g : " + primmitiveRoot);
             int privateKey = generatePrivateKey(prime);
+            Console.WriteLine("Server tao privatekey : " + privateKey);
             int publicKey = generatePublicKey(prime, primmitiveRoot, privateKey);
+            Console.WriteLine("Server tinh publickey = " + publicKey);
+            Console.WriteLine("Server yeu cau trao doi public key, gui p = " + prime + " g = " + primmitiveRoot + " server publickey = " + publicKey + " cho Client");
+
             SendData(keyExchangeHeader + "|" + prime + "|" + primmitiveRoot + "|" + publicKey + "|", client);
             while (true)
             {
                 if (stream.CanRead != true || stream.CanWrite != true) break;
-                //try
-                //{
+                try
+                {
                     string message = ReceiveData(stream, client);
                     //prcessing
                     string[] data = message.Split('|');
@@ -122,7 +129,8 @@ namespace SERVER
                     if (message.StartsWith(keyExchangeHeader))
                     {
                         secretKey = GenerateSecretKey(prime, privateKey, Int32.Parse(data[1]));
-                        Console.WriteLine("sERVER KEY: " + secretKey);
+                    Console.WriteLine("Server nhan duoc client publickey = " + data[1]  );
+                    Console.WriteLine("Server tinh Secretkey = " + secretKey);
                     }
                     //sign up
                     else if (message.StartsWith(registerHeader))
@@ -246,14 +254,14 @@ namespace SERVER
                         }
                         catch { }
                     }
-                //}
-                //catch
-                //{
-                //    client.Close();
-                //    stream.Close();
-                //    return;
-                //}
             }
+                catch
+            {
+                client.Close();
+                stream.Close();
+                return;
+            }
+        }
 
         }
 
@@ -385,11 +393,11 @@ namespace SERVER
             string message = Encoding.UTF8.GetString(buffer);
             Console.WriteLine("Server-Received: " + message);
             message = message.Substring(0, message.IndexOf("\0\0\0\0\0"));
-            Console.WriteLine("Server" + message);
+            Console.WriteLine("Tin nhan nhan duoc tu client: " + message);
             if (!message.StartsWith(keyExchangeHeader)) {
-                message = EncryptMessage(message, secretKey);
+                message = DecryptMessage(message, secretKey);
             }
-            Console.WriteLine("Server" + message);
+            Console.WriteLine("Tin nhan sau khi decrypt: " + message);
             return message;
 
         }

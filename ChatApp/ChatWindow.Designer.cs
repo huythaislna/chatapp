@@ -33,7 +33,7 @@
             this.member_lv = new System.Windows.Forms.ListView();
             this.message_tb = new System.Windows.Forms.TextBox();
             this.group_name_gb = new System.Windows.Forms.GroupBox();
-            this.chat_lw = new System.Windows.Forms.ListBox();
+            this.chat_lw = new System.Windows.Forms.RichTextBox();
             this.send_pt = new System.Windows.Forms.PictureBox();
             this.exit_pt = new System.Windows.Forms.PictureBox();
             this.member_gb.SuspendLayout();
@@ -72,9 +72,11 @@
             // 
             this.message_tb.Font = new System.Drawing.Font("Segoe UI Black", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.message_tb.Location = new System.Drawing.Point(228, 402);
+            this.message_tb.Multiline = true;
             this.message_tb.Name = "message_tb";
-            this.message_tb.Size = new System.Drawing.Size(450, 30);
+            this.message_tb.Size = new System.Drawing.Size(450, 26);
             this.message_tb.TabIndex = 0;
+            this.message_tb.TextChanged += new System.EventHandler(this.message_tb_TextChanged);
             this.message_tb.KeyDown += new System.Windows.Forms.KeyEventHandler(this.message_tb_KeyDown);
             // 
             // group_name_gb
@@ -92,14 +94,12 @@
             // 
             // chat_lw
             // 
-            this.chat_lw.BackColor = System.Drawing.Color.White;
-            this.chat_lw.ColumnWidth = 540;
-            this.chat_lw.FormattingEnabled = true;
-            this.chat_lw.ItemHeight = 26;
-            this.chat_lw.Location = new System.Drawing.Point(6, 25);
+            this.chat_lw.Location = new System.Drawing.Point(11, 30);
             this.chat_lw.Name = "chat_lw";
-            this.chat_lw.Size = new System.Drawing.Size(536, 368);
+            this.chat_lw.Size = new System.Drawing.Size(525, 342);
             this.chat_lw.TabIndex = 0;
+            this.chat_lw.Text = "";
+            this.chat_lw.TextChanged += new System.EventHandler(this.chat_lw_TextChanged);
             // 
             // send_pt
             // 
@@ -136,10 +136,10 @@
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(807, 499);
             this.ControlBox = false;
+            this.Controls.Add(this.message_tb);
             this.Controls.Add(this.exit_pt);
             this.Controls.Add(this.send_pt);
             this.Controls.Add(this.group_name_gb);
-            this.Controls.Add(this.message_tb);
             this.Controls.Add(this.member_gb);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -165,6 +165,6 @@
         private System.Windows.Forms.GroupBox group_name_gb;
         private System.Windows.Forms.PictureBox send_pt;
         private System.Windows.Forms.PictureBox exit_pt;
-        private System.Windows.Forms.ListBox chat_lw;
+        private System.Windows.Forms.RichTextBox chat_lw;
     }
 }

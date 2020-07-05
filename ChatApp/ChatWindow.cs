@@ -100,30 +100,29 @@ namespace ChatApp
                     //message chat incoming
                     else if (message.StartsWith(adminHeader)) 
                     {
-                        chat_lw.Items.Add(message.Replace(adminHeader, ""));
-                        int visibleItems = chat_lw.ClientSize.Height / chat_lw.ItemHeight;
-                        chat_lw.TopIndex = Math.Max(chat_lw.Items.Count - visibleItems + 1, 0);
+                        chat_lw.Text += (message.Replace(adminHeader, ""));
                     }
                      else if (message.StartsWith(chatHeader))
                     {
                         
                         message = message.Replace(chatHeader, "");
 
-                        
-                        while (message.Length != 0)
-                        {
-                            int i = break_pos(message);
-                            if (i != message.Length)
-                            {
-                                print(message.Remove(i + 1));
-                                message = message.Remove(0, i);
-                            }
-                            else
-                            {
-                                print(message);
-                                message = "";
-                            }
-                        }
+
+                        //while (message.Length != 0)
+                        //{
+                        //    int i = break_pos(message);
+                        //    if (i != message.Length)
+                        //    {
+                        //        print(message.Remove(i + 1));
+                        //        message = message.Remove(0, i);
+                        //    }
+                        //    else
+                        //    {
+                        //        print(message);
+                        //        message = "";
+                        //    }
+                        //}
+                        print(message);
                     }
 
                 }
@@ -171,13 +170,19 @@ namespace ChatApp
         }
         private void message_tb_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Shift)
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    return;
+                }
+            }
             if (e.KeyCode == Keys.Enter)
             {
                 if (message_tb.Text != "")
                 {
                     SendData(chatHeader + "|" + message_tb.Text);
                     message_tb.Text = "";
-
                 }
             }
         }
@@ -201,10 +206,7 @@ namespace ChatApp
         }
         private void print(string m)
         {
-            //ListViewItem it = new ListViewItem(m);
-            chat_lw.Items.Add(m);
-            int visibleItems = chat_lw.ClientSize.Height / chat_lw.ItemHeight;
-            chat_lw.TopIndex = Math.Max(chat_lw.Items.Count - visibleItems + 1, 0);
+            chat_lw.Text += "\r\n" + m;
         }
         private void pictureBox1_Click(object sender, EventArgs e)
         {
@@ -223,6 +225,50 @@ namespace ChatApp
         private void exit_bt_Click(object sender, EventArgs e)
         {
             SendData(outRoomHeader);
+        }
+
+        private void message_tb_TextChanged(object sender, EventArgs e)
+        {
+            //int heightInit = 19;
+            //Point locationInit = new Point(273, 244);
+            //int numberOfLine = (message_tb.Text.Split('\n').Length + 1);
+            //int a = message_tb.Height;
+            //Point location = message_tb.Location;
+            //if (message_tb.Text == "")
+            //{
+            //    message_tb.Height = heightInit;
+            //    message_tb.Location = locationInit;
+            //}
+            //else
+            //{
+            //    if (numberOfLine < 15)
+            //    {
+            //        if (numberOfLine == 2)
+            //        {
+            //            message_tb.Height = heightInit;
+            //        }
+            //        else
+            //            message_tb.Height = heightInit + (numberOfLine - 2) * message_tb.Font.Height;
+            //        //message_tb.Height =  (numberOfLine ) * message_tb.Font.Height;
+            //        if (a < message_tb.Height)
+            //            message_tb.Location = new Point(message_tb.Location.X, message_tb.Location.Y - message_tb.Font.Height);
+            //        else if (a > message_tb.Height)
+            //            message_tb.Location = new Point(message_tb.Location.X, message_tb.Location.Y + message_tb.Font.Height);
+
+            //    }
+            //    else
+            //    {
+            //        message_tb.ScrollBars = ScrollBars.Both;
+            //    }
+            //}
+        }
+
+        private void chat_lw_TextChanged(object sender, EventArgs e)
+        {
+            // set the current caret position to the end
+            chat_lw.SelectionStart = chat_lw.Text.Length;
+            // scroll it automatically
+            chat_lw.ScrollToCaret();
         }
     }
 }

@@ -48,8 +48,7 @@ namespace SERVER
             {
                 output[i] = (char)(data[i] ^ key[i % keyLen]);
             }
-
-            Console.WriteLine("Xor-Client: " + new string(output));
+            
             return new string(output);
         }
         public static string EncryptMessage(string plainText, int key)
@@ -70,7 +69,7 @@ namespace SERVER
         }
         static public int generatePrivateKey(int p)
         {
-            Random rnd = new Random();
+            Random rnd = new Random(p*100);
             int a = rnd.Next(p - 1);
             return a;
         }

@@ -58,9 +58,11 @@ namespace ChatApp
                 CheckForIllegalCrossThreadCalls = false;
                 client = new TcpClient();
                 client.Connect(serverIpAddress, serverPort);
+                Console.WriteLine("Client - ket noi den Server");
                 stream = client.GetStream();
                 Thread listen = new Thread(listenToServer);
                 listen.Start();
+
             }
             catch
             {
@@ -76,15 +78,15 @@ namespace ChatApp
                 byte[] instream = new byte[bufferSize];
                 stream.Read(instream, 0, bufferSize);
                 var message = Encoding.UTF8.GetString(instream);
-                Console.WriteLine("Client-receive: " + message);
+                Console.WriteLine("Tin nhan nhan duoc tu Server: " + message);
 
                 //message = message.Substring(0, message.IndexOf('\0'));
                 message = message.Substring(0, message.IndexOf("\0\0\0\0\0"));
                 //decrypt incoming message
                 if (!message.StartsWith(keyExchangeHeader))
                 {
-                    message = EncryptMessage(message, secretKey);
-                    Console.WriteLine("Client" + message);
+                    message = DecryptMessage(message, secretKey);
+                    Console.WriteLine("Tin nhan sau khi Decrypt: " + message);
                 }
                 else
                 {
@@ -92,10 +94,14 @@ namespace ChatApp
                     int prime = Int32.Parse(keys[1]);
                     int primmitiveRoot = Int32.Parse(keys[2]);
                     privateKey = generatePrivateKey(prime);
+                    Console.WriteLine("Client tao privatekey: " + privateKey);
                     int publicKeyOfServer = Int32.Parse(keys[3]);
+                    publicKey = generatePublicKey(prime, primmitiveRoot, privateKey);
+                    Console.WriteLine("Client tinh publickey = " + publicKey);
                     secretKey = GenerateSecretKey(prime, privateKey, publicKeyOfServer);
-                    Console.WriteLine("Client secretkey: " + secretKey);
-                    SendData(keyExchangeHeader + "|" + generatePublicKey(prime, primmitiveRoot, privateKey));
+                    Console.WriteLine("Client tinh secretkey = " + secretKey);
+                    Console.WriteLine("Client gui client publickey = " + publicKey + " cho Server");
+                    SendData(keyExchangeHeader + "|" + publicKey);
                 }
 
 
