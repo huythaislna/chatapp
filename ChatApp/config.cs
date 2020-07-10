@@ -24,6 +24,7 @@ namespace SERVER
         public static string joinSuccessHeader = "JOIN_SUCCESS";
         public static string getGroupNameHeader = "GET_ROOM_NAME";
         public static string updateMemberHeader = "UPDATE_MEMBER";
+        public static string redirectHeader = "REDIRECT";
 
 
         public static string chatHeader = "CHAT";

@@ -37,7 +37,7 @@ namespace SERVER
 
         }
 
-        string secondServer = "127.0.0.1";
+        string secondServer = "192.168.36.108";
 
         IPAddress ipAddress;
         Int32 port = 8080;
@@ -77,7 +77,7 @@ namespace SERVER
         private void Setup()
         {
             CheckForIllegalCrossThreadCalls = false;
-            dbClient = new MongoClient("mongodb://127.0.0.1:27017/");
+            dbClient = new MongoClient("mongodb://192.168.36.108:27017/");
             database = dbClient.GetDatabase("chatapp");
             ipAddress = IPAddress.Parse("127.0.0.1");
             TcpServer = new TcpListener(IPAddress.Any, port);
@@ -188,8 +188,9 @@ namespace SERVER
                     {
                         if (data[2][0] > 'd')
                         {
-                            SendData(redirectHeader + "|" + secondServer, client);
-                        }
+                            SendData(Encrypt(redirectHeader + secondServer, clientPublicKey), client);
+                        } else
+                        {
                         User user = new User
                         {
                             UserConnection = client,
@@ -203,6 +204,7 @@ namespace SERVER
                         SendData(Encrypt(adminHeader + "Admin: Welcome! " + user.Display_name, clientPublicKey), client);
                         usersInRoom.Add(user);
                         updateMember(client);
+                        }
                     }
 
                     //chat message
@@ -220,7 +222,7 @@ namespace SERVER
                         {
                             if (checkUserInRoom(data[1], data[2]) == false)
                             {
-                                SendData(Encrypt(joinSuccessHeader + getRoomName(data[1]), clientPublicKey), client);
+                                SendData(Encrypt(joinSuccessHeader + getRoomName(data[1]) + "|" + redirectHeader + secondServer, clientPublicKey), client);
                             } else
                             {
                                 SendData(Encrypt(errorHeader + "You have already been in room", clientPublicKey), client);

@@ -26,8 +26,10 @@ namespace ChatApp
         public static string username = null;
         public static string room_id = null;
         public static string room_name = null;
+
+        public static string chatIpServer = null;
         //declare for setup
-        public const string serverIpAddress = "192.168.43.157";
+        public const string serverIpAddress = "127.0.0.1";
         public const int serverPort = 8080;
 
         public Client()
@@ -148,8 +150,12 @@ namespace ChatApp
                 //join room
                 if (message.StartsWith(joinSuccessHeader))
                 {
+                    string[] data = message.Split('|');
                     room_id = Join_tb.Text;
-                    room_name = message.Replace(joinSuccessHeader, "");
+                    room_name = data[0].Replace(joinSuccessHeader, "");
+                    //chatIpServer = data[1].Replace(redirectHeader, "");
+                    if (chatIpServer == null)
+                        chatIpServer = serverIpAddress;
                     Join_tb.Text = "";
                     error_id_lb.Text = "";
                     ChatWindow cw = new ChatWindow();

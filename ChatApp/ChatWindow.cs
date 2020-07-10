@@ -25,7 +25,7 @@ namespace ChatApp
 
 
         //declare for setup
-        public const string ipAddress = serverIpAddress;
+        //public string chatIpServer = serverIpAddress;
         public const int port = serverPort;
 
         public ChatWindow()
@@ -46,7 +46,7 @@ namespace ChatApp
             {
                 CheckForIllegalCrossThreadCalls = false;
                 client = new TcpClient();
-                client.Connect(ipAddress, port);
+                client.Connect(chatIpServer, port);
                 stream = client.GetStream();
                 Thread listen = new Thread(listenToServer);
                 listen.Start();
@@ -62,8 +62,8 @@ namespace ChatApp
         {
             while (true)
             {
-                try
-                {
+                //try
+                //{
                     var bufferSize = client.ReceiveBufferSize;
                     byte[] instream = new byte[bufferSize];
                     stream.Read(instream, 0, bufferSize);
@@ -78,12 +78,13 @@ namespace ChatApp
                     if (!message.StartsWith(keyExchangeHeader)) message = Decrypt(message, privateKeyString);
                     Console.WriteLine("Client-decrypt: " + message);
 
-                    //update members in room
                     if (message.StartsWith(keyExchangeHeader))
                     {
                         serverPublicKey = message.Split('|')[1];
                         SendData(keyExchangeHeader + "|" + publicKeyString);
                     } 
+
+                    //update members in room
                     else if (message.StartsWith(updateMemberHeader))
                     {
                         member_lv.Items.Clear();
@@ -95,8 +96,6 @@ namespace ChatApp
                         }
 
                     }
-
-
                     //out a chat session
                     else if (message.StartsWith(outSuccessHeader))
                     {
@@ -120,15 +119,15 @@ namespace ChatApp
                         print(message);
                     }
 
-                }
-                catch
-                {
-                    MessageBox.Show("Get an unexpected error! Try again later");
-                    client.Close();
-                    stream.Close();
-                    this.Close();
-                    return;
-                }
+                //}
+                //catch
+                //{
+                //    MessageBox.Show("Get an unexpected error! Try again later");
+                //    client.Close();
+                //    stream.Close();
+                //    this.Close();
+                //    return;
+                //}
             }
         }
 
