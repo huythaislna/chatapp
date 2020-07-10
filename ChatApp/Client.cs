@@ -17,6 +17,7 @@ namespace ChatApp
     public partial class Client : Form
     {
         //header
+        public string[] serverIpList = { "127.0.0.1", "10.10.250.128", "10.10.81.46" };
 
 
         //stream and tcpClient for room
@@ -26,7 +27,7 @@ namespace ChatApp
         public static string room_id = null;
         public static string room_name = null;
         //declare for setup
-        public const string serverIpAddress = "127.0.0.1";
+        public const string serverIpAddress = "192.168.43.157";
         public const int serverPort = 8080;
 
         public Client()
@@ -67,7 +68,14 @@ namespace ChatApp
             {
                 CheckForIllegalCrossThreadCalls = false;
                 client = new TcpClient();
-                client.Connect(serverIpAddress, serverPort);
+                foreach(var ip in serverIpList)
+                {
+                    try
+                    {
+                        client.Connect(ip, serverPort);
+                        break;
+                    } catch { }
+                }
                 stream = client.GetStream();
                 Thread listen = new Thread(listenToServer);
                 listen.Start();
@@ -101,6 +109,7 @@ namespace ChatApp
                 {
                     serverPublicKey = message.Split('|')[1];
                     SendData(keyExchangeHeader + "|" + publicKeyString);
+                    signin_btn.Enabled = true;
                 }
                 if (message.StartsWith(loginSuccessHeader))
                 {
@@ -210,7 +219,7 @@ namespace ChatApp
 
         private void pw_tb_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
+            if (e.KeyCode == Keys.Enter && signin_btn.Enabled == true)
             {
                 if (check())
                 {

@@ -16,8 +16,6 @@ namespace ChatApp
 
     public partial class createRoom : Form
     {
-        const string createHeader = "createabc##";
-        const string createRoomSuccess = "creakjkjtiejkjkj12jifasjfdk123123j";
 
         public createRoom()
         {
@@ -85,7 +83,7 @@ namespace ChatApp
         {
             if (room_name_tb.Text != "")
             {
-                SendData(createHeader + "|" + room_name_tb.Text + "|");
+                SendData(createRoomHeader + "|" + room_name_tb.Text + "|");
                 ReceiveMessage();
             }
             else
@@ -98,7 +96,7 @@ namespace ChatApp
             {
                 if (room_name_tb.Text != "")
                 {
-                    SendData(createHeader + "|" + room_name_tb.Text + "|");
+                    SendData(createRoomHeader + "|" + room_name_tb.Text + "|");
                     ReceiveMessage();
 
                 }

@@ -47,6 +47,7 @@
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.room_tab = new System.Windows.Forms.TabPage();
+            this.signout_pt = new System.Windows.Forms.PictureBox();
             this.Create_group_btn = new System.Windows.Forms.Button();
             this.join_btn = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
@@ -78,7 +79,6 @@
             this.pictureBox10 = new System.Windows.Forms.PictureBox();
             this.username_tip = new System.Windows.Forms.ToolTip(this.components);
             this.pwd_tip = new System.Windows.Forms.ToolTip(this.components);
-            this.signout_pt = new System.Windows.Forms.PictureBox();
             this.client_control.SuspendLayout();
             this.signin_tab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.exit_pb)).BeginInit();
@@ -86,6 +86,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.room_tab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.signout_pt)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
             this.signup_tab.SuspendLayout();
@@ -95,7 +96,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.signout_pt)).BeginInit();
             this.SuspendLayout();
             // 
             // client_control
@@ -247,6 +247,7 @@
             this.signin_btn.BackgroundImage = global::ChatApp.Properties.Resources._100790964_686014118855549_1343039108137615360_n;
             this.signin_btn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.signin_btn.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.signin_btn.Enabled = false;
             this.signin_btn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.signin_btn.Font = new System.Drawing.Font("Segoe UI Black", 10F);
             this.signin_btn.ForeColor = System.Drawing.Color.WhiteSmoke;
@@ -348,6 +349,19 @@
             this.room_tab.TabIndex = 1;
             this.room_tab.Text = "ROOM";
             this.room_tab.UseVisualStyleBackColor = true;
+            // 
+            // signout_pt
+            // 
+            this.signout_pt.BackColor = System.Drawing.Color.Transparent;
+            this.signout_pt.BackgroundImage = global::ChatApp.Properties.Resources.exit;
+            this.signout_pt.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.signout_pt.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.signout_pt.Location = new System.Drawing.Point(352, 431);
+            this.signout_pt.Name = "signout_pt";
+            this.signout_pt.Size = new System.Drawing.Size(57, 62);
+            this.signout_pt.TabIndex = 28;
+            this.signout_pt.TabStop = false;
+            this.signout_pt.Click += new System.EventHandler(this.signout_pt_Click);
             // 
             // Create_group_btn
             // 
@@ -723,19 +737,6 @@
             this.pictureBox10.TabIndex = 36;
             this.pictureBox10.TabStop = false;
             // 
-            // signout_pt
-            // 
-            this.signout_pt.BackColor = System.Drawing.Color.Transparent;
-            this.signout_pt.BackgroundImage = global::ChatApp.Properties.Resources.exit;
-            this.signout_pt.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.signout_pt.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.signout_pt.Location = new System.Drawing.Point(352, 431);
-            this.signout_pt.Name = "signout_pt";
-            this.signout_pt.Size = new System.Drawing.Size(57, 62);
-            this.signout_pt.TabIndex = 28;
-            this.signout_pt.TabStop = false;
-            this.signout_pt.Click += new System.EventHandler(this.signout_pt_Click);
-            // 
             // Client
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -762,6 +763,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.room_tab.ResumeLayout(false);
             this.room_tab.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.signout_pt)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
             this.signup_tab.ResumeLayout(false);
@@ -772,7 +774,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.signout_pt)).EndInit();
             this.ResumeLayout(false);
 
         }

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SERVER.Header;
 using static SERVER.RSA;
+using static ChatApp.Client;
 
 namespace ChatApp
 {
@@ -24,8 +25,8 @@ namespace ChatApp
 
 
         //declare for setup
-        public const string serverIpAddress = "127.0.0.1";
-        public const int serverPort = 8080;
+        public const string ipAddress = serverIpAddress;
+        public const int port = serverPort;
 
         public ChatWindow()
         {
@@ -45,7 +46,7 @@ namespace ChatApp
             {
                 CheckForIllegalCrossThreadCalls = false;
                 client = new TcpClient();
-                client.Connect(serverIpAddress, serverPort);
+                client.Connect(ipAddress, port);
                 stream = client.GetStream();
                 Thread listen = new Thread(listenToServer);
                 listen.Start();
@@ -110,9 +111,6 @@ namespace ChatApp
                     //message chat incoming
                     else if (message.StartsWith(adminHeader)) 
                     {
-                        //chat_lw.Items.Add(message.Replace(adminHeader, ""));
-                        //int visibleItems = chat_lw.ClientSize.Height / chat_lw.ItemHeight;
-                        //chat_lw.TopIndex = Math.Max(chat_lw.Items.Count - visibleItems + 1, 0);
                         chat_lw.Text += (message.Replace(adminHeader, ""));
                     }
                      else if (message.StartsWith(chatHeader))
@@ -120,21 +118,6 @@ namespace ChatApp
                         
                         message = message.Replace(chatHeader, "");
                         print(message);
-                        
-                        //while (message.Length != 0)
-                        //{
-                        //    int i = break_pos(message);
-                        //    if (i != message.Length)
-                        //    {
-                        //        print(message.Remove(i + 1));
-                        //        message = message.Remove(0, i);
-                        //    }
-                        //    else
-                        //    {
-                        //        print(message);
-                        //        message = "";
-                        //    }
-                        //}
                     }
 
                 }
@@ -190,25 +173,11 @@ namespace ChatApp
             SendData(startChatSession + "|" + Client.username + "|" + Client.room_id);;
             group_name_gb.Text = Client.room_name.ToUpper() + " - ID: " + Client.room_id;
         }
+
+        //shift enter
         int shift = 0;
         private void message_tb_KeyDown(object sender, KeyEventArgs e)
         {
-            //giống k? k
-            //if (e.Shift)
-            //{
-            //    if (e.KeyCode == Keys.Enter)
-            //    {
-            //        return;
-            //    }
-            //}
-            //if (e.KeyCode == Keys.Enter)
-            //{
-            //    if (message_tb.Text != "\r\n" && message_tb.Text != "")
-            //    {
-            //        SendData(chatHeader + "|" + message_tb.Text);
-            //    }
-            //    message_tb.Text = "";
-            //}
             if (Control.ModifierKeys == Keys.Shift)
             {
                 shift = 1;
@@ -226,30 +195,9 @@ namespace ChatApp
             }
             else { shift = 0; }
         }
-        private int break_pos(string mess)
-        {
-            
-            if (mess.Length > 42)
-            {
-                for (int i = 42; i > 0; i--)
-                {
-                    if (mess[i] == ' ')
-                    {
-                        return i;
-                    }
-                }
-                return 42;
-            }
-            return mess.Length;
 
-
-        }
         private void print(string m)
         {
-            //ListViewItem it = new ListViewItem(m);
-            //chat_lw.Items.Add(m);
-            //int visibleItems = chat_lw.ClientSize.Height / chat_lw.ItemHeight;
-            //chat_lw.TopIndex = Math.Max(chat_lw.Items.Count - visibleItems + 1, 0);
             chat_lw.Text += "\r\n" + m;
         }
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -294,7 +242,7 @@ namespace ChatApp
             }
             else
             {
-                if (numberOfLine < 15)
+                if (numberOfLine < 8)
                 {
                     message_tb.ScrollBars = ScrollBars.None;
                     if (numberOfLine == 2)

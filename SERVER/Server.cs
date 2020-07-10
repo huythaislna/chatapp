@@ -37,6 +37,7 @@ namespace SERVER
 
         }
 
+        string secondServer = "127.0.0.1";
 
         IPAddress ipAddress;
         Int32 port = 8080;
@@ -185,6 +186,10 @@ namespace SERVER
                     //start chat - initial user 
                     else if (message.StartsWith(startChatSession))
                     {
+                        if (data[2][0] > 'd')
+                        {
+                            SendData(redirectHeader + "|" + secondServer, client);
+                        }
                         User user = new User
                         {
                             UserConnection = client,
@@ -203,7 +208,8 @@ namespace SERVER
                     //chat message
                     else if (message.StartsWith(chatHeader))
                     {
-                        sendToRoom(chatHeader + getUser(client).Display_name + ": " + data[1], getUser(client).Room_id);
+                        message = message.Substring(message.IndexOf('|') + 1, message.Length - chatHeader.Length - 1);
+                        sendToRoom(chatHeader + getUser(client).Display_name + ": " + message, getUser(client).Room_id);
                     }
 
 
@@ -412,6 +418,5 @@ namespace SERVER
         {
             //Setup();
         }
-
     }
 }
