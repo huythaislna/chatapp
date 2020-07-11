@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SERVER.Header;
 using static SERVER.Cipher;
+using SERVER;
 
 namespace ChatApp
 {
@@ -88,71 +89,60 @@ namespace ChatApp
                 message = XORCipher(message.Substring(0, length + 10));
                 message = message.Substring(10, length);
 
-                //login
-                if (message.StartsWith(loginSuccessHeader))
+                string[] data = message.Split('|');
+                switch(data[0])
                 {
-                    username = user_tb.Text;
-                    error_lb.Text = "";
-                    client_control.SelectedIndex = 1;
-                }
-                else if (message.StartsWith(loginFailHeader))
-                {
-                    message = message.Replace(loginFailHeader, "");
-                    error_lb.Text = "⚠ " + message;
-                }
+                    case "LOGIN_SUCCESS":
+                        username = user_tb.Text;
+                        error_lb.Text = "";
+                        client_control.SelectedIndex = 1;
+                        break;
 
-                //sign up
-                else if (message.StartsWith("Username is existed!"))
-                {
-                    username_error_lb.Text = (message);
-                    signup_btn.Enabled = true;
-                }
-                else if (message.StartsWith("Sign up successful!"))
-                {
-                    MessageBox.Show(message);
-                    client_control.SelectedIndex = 0;
-                }
-                else if (message.StartsWith("Password is invalid"))
-                {
-                    pwd_error_lb.Text = "⚠ " + message;
-                }
-                else if (message.StartsWith("Username is invalid"))
-                {
-                    username_error_lb.Text = "⚠ " + message;
-                }
+                    case "LOGIN_FAIL":
+                        error_lb.Text = "⚠ " + data[1];
+                        break;
 
-                //room menu
+                    case "Username is existed!":
+                        username_error_lb.Text = "⚠ " + data[0];
+                        signup_btn.Enabled = true;
+                        break;
 
-                //join room
-                if (message.StartsWith(joinSuccessHeader))
-                {
-                    string[] data = message.Split('|');
-                    room_id = Join_tb.Text;
-                    room_name = data[0].Replace(joinSuccessHeader, "");
-                    chatIpServer = data[1].Replace(redirectHeader, "");
-                    if (chatIpServer == null)
-                        chatIpServer = serverIpAddress;
-                    Join_tb.Text = "";
-                    error_id_lb.Text = "";
-                    ChatWindow cw = new ChatWindow();
-                    cw.Show();
-                }
+                    case "ERROR":
+                        error_id_lb.Text = "⚠ " + data[1];
+                        break;
 
-                //join room failed
-                else if (message.StartsWith(errorHeader))
-                {
-                    error_id_lb.Text = "⚠ " + message.Replace(errorHeader, "");
-                }
+                    case "SIGN_OUT_SUCCESS":
+                        client_control.SelectedIndex = 0;
+                        Setup();
+                        break;
 
-                //sign out
-                else if (message.StartsWith(signOutSuccess))
-                {
-                    client_control.SelectedIndex = 0;
-                    //this.Close();
-                    Setup();
-                }
+                    case "JOIN_SUCCESS":
+                        room_id = Join_tb.Text;
+                        room_name = data[1];
+                        chatIpServer = data[2].Replace(redirectHeader, "");
+                        if (chatIpServer == null)
+                            chatIpServer = serverIpAddress;
+                        Join_tb.Text = "";
+                        error_id_lb.Text = "";
+                        ChatWindow cw = new ChatWindow();
+                        cw.Show();
+                        break;
+
+                    case "Sign up successful!":
+                        MessageBox.Show(data[0]);
+                        client_control.SelectedIndex = 0;
+                        break;
+
+                    case "Password is invalid!":
+                        pwd_error_lb.Text = "⚠ " + data[0];
+                        break;
+
+                    case "Username is invalid!":
+                        username_error_lb.Text = "⚠ " + data[0];
+                        break;
 
 
+                }
             }
             catch
             {

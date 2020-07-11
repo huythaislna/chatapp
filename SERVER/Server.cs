@@ -132,7 +132,7 @@ namespace SERVER
                         {
                             if (user.Key == data[1])
                             {
-                                SendData(loginFailHeader + "This account have been being used", client);
+                                SendData(loginFailHeader + "|" + "This account have been being used", client);
                                 isUsed = true;
                                 break;
                             }
@@ -144,7 +144,7 @@ namespace SERVER
                                 SendData(loginSuccessHeader, client);
                                 signedInUsers.Add(data[1], client);
                             }
-                            else SendData(loginFailHeader + "Username or Password was wrong", client);
+                            else SendData(loginFailHeader + "|" + "Username or Password was wrong", client);
                         }
                     }
                     //signout
@@ -213,18 +213,18 @@ namespace SERVER
                             if (checkUserInRoom(data[1], data[2]) == false)
                             {
                                 if (isRedirect)
-                                    SendData(joinSuccessHeader + getRoomName(data[1]) + "|" + redirectHeader + secondServer, client);
+                                    SendData(joinSuccessHeader + "|" + getRoomName(data[1]) + "|" + redirectHeader + secondServer, client);
                                 else
-                                    SendData(joinSuccessHeader + getRoomName(data[1]) + "|" + redirectHeader, client);
+                                    SendData(joinSuccessHeader + "|" + getRoomName(data[1]) + "|" + redirectHeader, client);
                             }
                             else
                             {
-                                SendData(errorHeader + "You have already been in room", client);
+                                SendData(errorHeader + "|" + "You have already been in room", client);
                             }
                         }
                         else
                         {
-                            SendData(errorHeader + "Room is not existed", client);
+                            SendData(errorHeader + "|" + "Room is not existed", client);
                         }
                     }
                     //update members
@@ -259,18 +259,18 @@ namespace SERVER
                 {
                     try
                     {
+                        client.Close();
+                        stream.Close();
                         var itemToRemove = signedInUsers.Single(r => r.Value == client);
                         signedInUsers.Remove(itemToRemove.Key);
                         foreach (var user in usersInRoom)
                         {
                             if (user.UserConnection == client)
                             {
-                                sendToRoom(adminHeader + "Admin: " + user.Display_name + " left!!", user.Room_id);
                                 usersInRoom.Remove(user);
+                                sendToRoom(adminHeader + "Admin: " + user.Display_name + " left!!", user.Room_id);
                             }
                         }
-                        client.Close();
-                        stream.Close();
                         return;
                     }
                     catch { }

@@ -33,9 +33,9 @@
             this.member_lv = new System.Windows.Forms.ListView();
             this.message_tb = new System.Windows.Forms.TextBox();
             this.group_name_gb = new System.Windows.Forms.GroupBox();
+            this.chat_lw = new System.Windows.Forms.RichTextBox();
             this.send_pt = new System.Windows.Forms.PictureBox();
             this.exit_pt = new System.Windows.Forms.PictureBox();
-            this.chat_lw = new System.Windows.Forms.RichTextBox();
             this.member_gb.SuspendLayout();
             this.group_name_gb.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.send_pt)).BeginInit();
@@ -92,6 +92,15 @@
             this.group_name_gb.TabStop = false;
             this.group_name_gb.Text = "groupName";
             // 
+            // chat_lw
+            // 
+            this.chat_lw.Location = new System.Drawing.Point(7, 32);
+            this.chat_lw.Name = "chat_lw";
+            this.chat_lw.Size = new System.Drawing.Size(536, 340);
+            this.chat_lw.TabIndex = 0;
+            this.chat_lw.Text = "";
+            this.chat_lw.TextChanged += new System.EventHandler(this.chat_lw_TextChanged);
+            // 
             // send_pt
             // 
             this.send_pt.BackColor = System.Drawing.Color.Transparent;
@@ -103,7 +112,7 @@
             this.send_pt.Size = new System.Drawing.Size(48, 30);
             this.send_pt.TabIndex = 6;
             this.send_pt.TabStop = false;
-            this.send_pt.Click += new System.EventHandler(this.pictureBox1_Click);
+            this.send_pt.Click += new System.EventHandler(this.sendBt_Click);
             // 
             // exit_pt
             // 
@@ -117,15 +126,6 @@
             this.exit_pt.TabIndex = 7;
             this.exit_pt.TabStop = false;
             this.exit_pt.Click += new System.EventHandler(this.exit_bt_Click);
-            // 
-            // chat_lw
-            // 
-            this.chat_lw.Location = new System.Drawing.Point(7, 32);
-            this.chat_lw.Name = "chat_lw";
-            this.chat_lw.Size = new System.Drawing.Size(536, 340);
-            this.chat_lw.TabIndex = 0;
-            this.chat_lw.Text = "";
-            this.chat_lw.TextChanged += new System.EventHandler(this.chat_lw_TextChanged);
             // 
             // ChatWindow
             // 

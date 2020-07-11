@@ -62,8 +62,8 @@ namespace ChatApp
         {
             while (true)
             {
-                //try
-                //{
+                try
+                {
                     var bufferSize = client.ReceiveBufferSize;
                     byte[] instream = new byte[bufferSize];
                     stream.Read(instream, 0, bufferSize);
@@ -109,15 +109,15 @@ namespace ChatApp
                         print(message);
                     }
 
-                //}
-                //catch
-                //{
-                //    MessageBox.Show("Get an unexpected error! Try again later");
-                //    client.Close();
-                //    stream.Close();
-                //    this.Close();
-                //    return;
-                //}
+                }
+                catch
+                {
+                    MessageBox.Show("Get an unexpected error! Try again later");
+                    client.Close();
+                    stream.Close();
+                    this.Close();
+                    return;
+                }
             }
         }
 
@@ -125,6 +125,11 @@ namespace ChatApp
         {
             try
             {
+                if (message.Length > 2500)
+                {
+                    MessageBox.Show("Message is two long!");
+                    return;
+                }
                 string length = message.Length.ToString();
                 message = String.Format("{0, -10}", length) + message;
                 Console.WriteLine(message);
@@ -139,15 +144,6 @@ namespace ChatApp
                 client.Close();
                 stream.Close();
                 this.Close();
-            }
-        }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            if (message_tb.Text != "")
-            {
-                SendData(chatHeader + "|" + message_tb.Text);
-                message_tb.Text = "";
-
             }
         }
 
@@ -183,7 +179,7 @@ namespace ChatApp
         {
             chat_lw.Text += "\r\n" + m;
         }
-        private void pictureBox1_Click(object sender, EventArgs e)
+        private void sendBt_Click(object sender, EventArgs e)
         {
             if (message_tb.Text != "")
             {
