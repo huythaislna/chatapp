@@ -25,7 +25,7 @@ namespace ChatApp
 
 
         //declare for setup
-        //public string chatIpServer = serverIpAddress;
+        public string chatIpServer = serverIpAddress;
         public const int port = serverPort;
 
         public ChatWindow()
@@ -68,15 +68,15 @@ namespace ChatApp
                     byte[] instream = new byte[bufferSize];
                     stream.Read(instream, 0, bufferSize);
                     string message = Encoding.UTF8.GetString(instream);
-                    //stream.Flush();
+                //stream.Flush();
 
-                    //process message
+                //process message
 
-                    int length = Int32.Parse(message.Substring(0, 10));
-                    message = message.Substring(10, length);
-                    message = XORCipher(message);
-                    //update members in room
-                    if (message.StartsWith(updateMemberHeader))
+                int length = Int32.Parse(XORCipher(message.Substring(0, 10)));
+                message = XORCipher(message.Substring(0, length + 10));
+                message = message.Substring(10, length);
+                //update members in room
+                if (message.StartsWith(updateMemberHeader))
                     {
                         member_lv.Items.Clear();
                         string[] member = message.Remove(0, updateMemberHeader.Length).Split('\n');
@@ -105,7 +105,6 @@ namespace ChatApp
                     }
                      else if (message.StartsWith(chatHeader))
                     {
-                        
                         message = message.Replace(chatHeader, "");
                         print(message);
                     }
@@ -126,16 +125,13 @@ namespace ChatApp
         {
             try
             {
+                string length = message.Length.ToString();
+                message = String.Format("{0, -10}", length) + message;
+                Console.WriteLine(message);
                 message = XORCipher(message);
-                byte[] length = Encoding.UTF8.GetBytes(message.Length.ToString());
-                byte[] lengthHeader = new byte[10];
-                length.CopyTo(lengthHeader, 0);
+
                 byte[] noti = Encoding.UTF8.GetBytes(message);
-                //stream.Write(noti, 0, noti.Length);
-                byte[] sentData = new byte[10 + noti.Length];
-                lengthHeader.CopyTo(sentData, 0);
-                noti.CopyTo(sentData, 10);
-                stream.Write(sentData, 0, sentData.Length);
+                stream.Write(noti, 0, noti.Length);
             }
             catch
             {

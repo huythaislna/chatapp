@@ -37,7 +37,7 @@ namespace SERVER
 
         }
 
-        string firstServer = "192.168.43.157";
+        string mainServer = "127.0.0.1";
         string secondServer = "127.0.0.1";
 
         IPAddress ipAddress;
@@ -48,7 +48,6 @@ namespace SERVER
 
         static readonly Dictionary<string, TcpClient> signedInUsers = new Dictionary<string, TcpClient>(); //username - tcpclient.
         static readonly List<User> usersInRoom = new List<User>();
-
 
         public Server()
         {
@@ -78,7 +77,7 @@ namespace SERVER
         private void Setup()
         {
             CheckForIllegalCrossThreadCalls = false;
-            dbClient = new MongoClient("mongodb://192.168.43.157:27017/");
+            dbClient = new MongoClient("mongodb://" + mainServer + ":27017/");
             database = dbClient.GetDatabase("chatapp");
             ipAddress = IPAddress.Parse("127.0.0.1");
             TcpServer = new TcpListener(IPAddress.Any, port);
@@ -114,9 +113,10 @@ namespace SERVER
                 try
                 {
                     string message = ReceiveData(stream, client);
-                    int length = Int32.Parse(message.Substring(0, 10));
+
+                    int length = Int32.Parse(XORCipher(message.Substring(0, 10)));
+                    message = XORCipher(message.Substring(0, length + 10));
                     message = message.Substring(10, length);
-                    if (!message.StartsWith(keyExchangeHeader)) message = XORCipher(message);
                     //prcessing
                     string[] data = message.Split('|');
                     //sign up
@@ -151,7 +151,7 @@ namespace SERVER
                     else if (message.StartsWith(signOutHeader))
                     {
                         signedInUsers.Remove(data[1]);
-                        foreach(var user in usersInRoom)
+                        foreach (var user in usersInRoom)
                         {
                             if (user.Username == data[1])
                             {
@@ -216,7 +216,8 @@ namespace SERVER
                                     SendData(joinSuccessHeader + getRoomName(data[1]) + "|" + redirectHeader + secondServer, client);
                                 else
                                     SendData(joinSuccessHeader + getRoomName(data[1]) + "|" + redirectHeader, client);
-                            } else
+                            }
+                            else
                             {
                                 SendData(errorHeader + "You have already been in room", client);
                             }
@@ -256,9 +257,23 @@ namespace SERVER
                 }
                 catch
                 {
-                    client.Close();
-                    stream.Close();
-                    return;
+                    try
+                    {
+                        var itemToRemove = signedInUsers.Single(r => r.Value == client);
+                        signedInUsers.Remove(itemToRemove.Key);
+                        foreach (var user in usersInRoom)
+                        {
+                            if (user.UserConnection == client)
+                            {
+                                sendToRoom(adminHeader + "Admin: " + user.Display_name + " left!!", user.Room_id);
+                                usersInRoom.Remove(user);
+                            }
+                        }
+                        client.Close();
+                        stream.Close();
+                        return;
+                    }
+                    catch { }
                 }
             }
 
@@ -273,7 +288,7 @@ namespace SERVER
         }
         private bool checkUserInRoom(string room_id, string username)
         {
-            foreach(var user in usersInRoom)
+            foreach (var user in usersInRoom)
             {
                 if (user.Room_id == room_id && username == user.Username)
                 {
@@ -349,14 +364,14 @@ namespace SERVER
                 SendData("Username is existed!", client);
                 return false;
             }
-            if (usernameRegex.IsMatch(username) == false || 
+            if (usernameRegex.IsMatch(username) == false ||
                 hasUpperChar.IsMatch(username) == true)
             {
                 SendData("Username is invalid!", client);
                 return false;
             }
-            if ((hasNumber.IsMatch(pwd) && hasUpperChar.IsMatch(pwd) && 
-                hasMiniMaxChars.IsMatch(pwd) && hasLowerChar.IsMatch(pwd)) == false) 
+            if ((hasNumber.IsMatch(pwd) && hasUpperChar.IsMatch(pwd) &&
+                hasMiniMaxChars.IsMatch(pwd) && hasLowerChar.IsMatch(pwd)) == false)
             {
                 SendData("Password is invalid!", client);
                 return false;
@@ -375,19 +390,15 @@ namespace SERVER
         //send a message
         private void SendData(string message, object clientObj)
         {
-            Console.WriteLine("Server-send: " + message);
             TcpClient client = clientObj as TcpClient;
             NetworkStream stream = client.GetStream();
-            //length
-            byte[] length = Encoding.UTF8.GetBytes(message.Length.ToString());
-            byte[] lengthHeader = new byte[10];
-            length.CopyTo(lengthHeader, 0);
+            string length = message.Length.ToString();
+            message = String.Format("{0, -10}", length) + message;
+            Console.WriteLine(message);
+            message = XORCipher(message);
+
             byte[] noti = Encoding.UTF8.GetBytes(message);
-            //stream.Write(noti, 0, noti.Length);
-            byte[] sentData = new byte[10 + noti.Length];
-            lengthHeader.CopyTo(sentData, 0);
-            noti.CopyTo(sentData, 10);
-            stream.Write(sentData, 0, sentData.Length);
+            stream.Write(noti, 0, noti.Length);
         }
 
         //get message from client

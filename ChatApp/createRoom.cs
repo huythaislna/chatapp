@@ -1,12 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using static ChatApp.Client;
 using static SERVER.Cipher;
@@ -23,19 +16,13 @@ namespace ChatApp
         }
         private void SendData(string message)
         {
-            if (!message.StartsWith(keyExchangeHeader))
-            {
-                message = XORCipher(message);
-            }
-            byte[] length = Encoding.UTF8.GetBytes(message.Length.ToString());
-            byte[] lengthHeader = new byte[10];
-            length.CopyTo(lengthHeader, 0);
+            string length = message.Length.ToString();
+            message = String.Format("{0, -10}", length) + message;
+            Console.WriteLine(message);
+            message = XORCipher(message);
+
             byte[] noti = Encoding.UTF8.GetBytes(message);
-            //stream.Write(noti, 0, noti.Length);
-            byte[] sentData = new byte[10 + noti.Length];
-            lengthHeader.CopyTo(sentData, 0);
-            noti.CopyTo(sentData, 10);
-            stream.Write(sentData, 0, sentData.Length);
+            stream.Write(noti, 0, noti.Length);
         }
         private void ReceiveMessage()
         {
@@ -47,10 +34,10 @@ namespace ChatApp
                 stream.Read(instream, 0, bufferSize);
                 var message = Encoding.UTF8.GetString(instream);
 
-                int length = Int32.Parse(message.Substring(0, 10));
-                Console.WriteLine("Client-received:" + message);
+                int length = Int32.Parse(XORCipher(message.Substring(0, 10)));
+                message = XORCipher(message.Substring(0, length + 10));
                 message = message.Substring(10, length);
-                message = XORCipher(message);
+
                 Console.WriteLine("Client-decrypt: " + message);
 
 

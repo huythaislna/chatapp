@@ -27,7 +27,7 @@ namespace ChatApp
 
         public static string chatIpServer = null;
         //declare for setup
-        public const string serverIpAddress = "192.168.43.157";
+        public const string serverIpAddress = "127.0.0.1";
         public const int serverPort = 8080;
 
         public Client()
@@ -41,16 +41,13 @@ namespace ChatApp
         {
             try
             {
+                string length = message.Length.ToString();
+                message = String.Format("{0, -10}", length) + message;
+                Console.WriteLine(message);
                 message = XORCipher(message);
-                byte[] length = Encoding.UTF8.GetBytes(message.Length.ToString());
-                byte[] lengthHeader = new byte[10];
-                length.CopyTo(lengthHeader, 0);
+
                 byte[] noti = Encoding.UTF8.GetBytes(message);
-                //stream.Write(noti, 0, noti.Length);
-                byte[] sentData = new byte[10 + noti.Length];
-                lengthHeader.CopyTo(sentData, 0);
-                noti.CopyTo(sentData, 10);
-                stream.Write(sentData, 0, sentData.Length);
+                stream.Write(noti, 0, noti.Length);
             }
             catch
             {
@@ -87,10 +84,9 @@ namespace ChatApp
 
                 //process message
 
-                //message = message.Substring(0, message.IndexOf('\0'));
-                int length = Int32.Parse(message.Substring(0, 10));
+                int length = Int32.Parse(XORCipher(message.Substring(0, 10)));
+                message = XORCipher(message.Substring(0, length + 10));
                 message = message.Substring(10, length);
-                message = XORCipher(message);
 
                 //login
                 if (message.StartsWith(loginSuccessHeader))
@@ -434,6 +430,11 @@ namespace ChatApp
         {
             SendData(signOutHeader + "|" + username + "|");
             listenToServer();
+        }
+
+        private void Client_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            SendData(signOutHeader + "|" + username + "|");
         }
     }
 }
