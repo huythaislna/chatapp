@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static ChatApp.Client;
-using static SERVER.RSA;
+using static SERVER.Cipher;
 using static SERVER.Header;
 namespace ChatApp
 {
@@ -25,7 +25,7 @@ namespace ChatApp
         {
             if (!message.StartsWith(keyExchangeHeader))
             {
-                message = Encrypt(message, serverPublicKey);
+                message = XORCipher(message);
             }
             byte[] length = Encoding.UTF8.GetBytes(message.Length.ToString());
             byte[] lengthHeader = new byte[10];
@@ -50,7 +50,7 @@ namespace ChatApp
                 int length = Int32.Parse(message.Substring(0, 10));
                 Console.WriteLine("Client-received:" + message);
                 message = message.Substring(10, length);
-                if (!message.StartsWith(keyExchangeHeader)) message = Decrypt(message, privateKeyString);
+                message = XORCipher(message);
                 Console.WriteLine("Client-decrypt: " + message);
 
 

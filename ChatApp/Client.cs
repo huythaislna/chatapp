@@ -10,15 +10,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SERVER.Header;
-using static SERVER.RSA;
+using static SERVER.Cipher;
 
 namespace ChatApp
 {
     public partial class Client : Form
     {
         //header
-        public string[] serverIpList = { "127.0.0.1", "10.10.250.128", "10.10.81.46" };
-
 
         //stream and tcpClient for room
         public static TcpClient client = null;
@@ -29,7 +27,7 @@ namespace ChatApp
 
         public static string chatIpServer = null;
         //declare for setup
-        public const string serverIpAddress = "127.0.0.1";
+        public const string serverIpAddress = "192.168.43.157";
         public const int serverPort = 8080;
 
         public Client()
@@ -43,10 +41,7 @@ namespace ChatApp
         {
             try
             {
-                if (! message.StartsWith(keyExchangeHeader))
-                {
-                message = Encrypt(message, serverPublicKey);
-                }
+                message = XORCipher(message);
                 byte[] length = Encoding.UTF8.GetBytes(message.Length.ToString());
                 byte[] lengthHeader = new byte[10];
                 length.CopyTo(lengthHeader, 0);
@@ -70,14 +65,7 @@ namespace ChatApp
             {
                 CheckForIllegalCrossThreadCalls = false;
                 client = new TcpClient();
-                foreach(var ip in serverIpList)
-                {
-                    try
-                    {
-                        client.Connect(ip, serverPort);
-                        break;
-                    } catch { }
-                }
+                client.Connect(serverIpAddress, serverPort);
                 stream = client.GetStream();
                 Thread listen = new Thread(listenToServer);
                 listen.Start();
@@ -101,18 +89,10 @@ namespace ChatApp
 
                 //message = message.Substring(0, message.IndexOf('\0'));
                 int length = Int32.Parse(message.Substring(0, 10));
-                Console.WriteLine("Client-received:" + message);
                 message = message.Substring(10, length);
-                if (!message.StartsWith(keyExchangeHeader)) message = Decrypt(message, privateKeyString);
-                Console.WriteLine("Client-decrypt: " + message);
+                message = XORCipher(message);
 
                 //login
-                if (message.StartsWith(keyExchangeHeader))
-                {
-                    serverPublicKey = message.Split('|')[1];
-                    SendData(keyExchangeHeader + "|" + publicKeyString);
-                    signin_btn.Enabled = true;
-                }
                 if (message.StartsWith(loginSuccessHeader))
                 {
                     username = user_tb.Text;
@@ -153,7 +133,7 @@ namespace ChatApp
                     string[] data = message.Split('|');
                     room_id = Join_tb.Text;
                     room_name = data[0].Replace(joinSuccessHeader, "");
-                    //chatIpServer = data[1].Replace(redirectHeader, "");
+                    chatIpServer = data[1].Replace(redirectHeader, "");
                     if (chatIpServer == null)
                         chatIpServer = serverIpAddress;
                     Join_tb.Text = "";
@@ -425,6 +405,7 @@ namespace ChatApp
 
         private void exit_pb_Click(object sender, EventArgs e)
         {
+            SendData(signOutHeader + "|" + username + "|");
             this.Close();
         }
 

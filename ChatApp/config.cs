@@ -34,65 +34,21 @@ namespace SERVER
         public static string signOutSuccess = "SIGN_OUT_SUCCESS";
     }
 
-    class RSA
+    class Cipher
     {
-        public static RSACryptoServiceProvider cryptoServiceProvider = new RSACryptoServiceProvider(1024); 
-        public static RSAParameters privateKey = cryptoServiceProvider.ExportParameters(true);
-        public static RSAParameters publicKey = cryptoServiceProvider.ExportParameters(false);
-        public static string publicKeyString = GetKeyString(publicKey);
-        public static string privateKeyString = GetKeyString(privateKey);
-        public static string serverPublicKey = "";
-
-        public static string Encrypt(string textToEncrypt, string publicKeyString)
+        public static string XORCipher(string data)
         {
-            var bytesToEncrypt = Encoding.UTF8.GetBytes(textToEncrypt);
+            string key = "thaihieu";
+            int dataLen = data.Length;
+            int keyLen = key.Length;
+            char[] output = new char[dataLen];
 
-            using (var rsa = new RSACryptoServiceProvider(1024))
+            for (int i = 0; i < dataLen; ++i)
             {
-                try
-                {
-                    rsa.FromXmlString(publicKeyString);
-                    var encryptedData = rsa.Encrypt(bytesToEncrypt, true);
-                    var base64Encrypted = Convert.ToBase64String(encryptedData);
-                    return base64Encrypted;
-                }
-                finally
-                {
-                    rsa.PersistKeyInCsp = false;
-                }
+                output[i] = (char)(data[i] ^ key[i % keyLen]);
             }
-        }
 
-        public static string GetKeyString(RSAParameters publicKey)
-        {
-            var stringWriter = new System.IO.StringWriter();
-            var xmlSerializer = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
-            xmlSerializer.Serialize(stringWriter, publicKey);
-            return stringWriter.ToString();
-        }
-
-        public static string Decrypt(string textToDecrypt, string privateKeyString)
-        {
-            var bytesToDescrypt = Encoding.UTF8.GetBytes(textToDecrypt);
-
-            using (var rsa = new RSACryptoServiceProvider(1024))
-            {
-                try
-                {
-
-                    // server decrypting data with private key                    
-                    rsa.FromXmlString(privateKeyString);
-
-                    var resultBytes = Convert.FromBase64String(textToDecrypt);
-                    var decryptedBytes = rsa.Decrypt(resultBytes, true);
-                    var decryptedData = Encoding.UTF8.GetString(decryptedBytes);
-                    return decryptedData.ToString();
-                }
-                finally
-                {
-                    rsa.PersistKeyInCsp = false;
-                }
-            }
+            return new string(output);
         }
     }
 }

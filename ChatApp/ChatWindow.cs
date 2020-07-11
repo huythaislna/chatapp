@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SERVER.Header;
-using static SERVER.RSA;
+using static SERVER.Cipher;
 using static ChatApp.Client;
 
 namespace ChatApp
@@ -68,24 +68,15 @@ namespace ChatApp
                     byte[] instream = new byte[bufferSize];
                     stream.Read(instream, 0, bufferSize);
                     string message = Encoding.UTF8.GetString(instream);
-                    stream.Flush();
+                    //stream.Flush();
 
                     //process message
 
                     int length = Int32.Parse(message.Substring(0, 10));
                     message = message.Substring(10, length);
-                    Console.WriteLine("Client-received:" + message);
-                    if (!message.StartsWith(keyExchangeHeader)) message = Decrypt(message, privateKeyString);
-                    Console.WriteLine("Client-decrypt: " + message);
-
-                    if (message.StartsWith(keyExchangeHeader))
-                    {
-                        serverPublicKey = message.Split('|')[1];
-                        SendData(keyExchangeHeader + "|" + publicKeyString);
-                    } 
-
+                    message = XORCipher(message);
                     //update members in room
-                    else if (message.StartsWith(updateMemberHeader))
+                    if (message.StartsWith(updateMemberHeader))
                     {
                         member_lv.Items.Clear();
                         string[] member = message.Remove(0, updateMemberHeader.Length).Split('\n');
@@ -135,10 +126,7 @@ namespace ChatApp
         {
             try
             {
-                if (!message.StartsWith(keyExchangeHeader))
-                {
-                    message = Encrypt(message, serverPublicKey);
-                }
+                message = XORCipher(message);
                 byte[] length = Encoding.UTF8.GetBytes(message.Length.ToString());
                 byte[] lengthHeader = new byte[10];
                 length.CopyTo(lengthHeader, 0);
