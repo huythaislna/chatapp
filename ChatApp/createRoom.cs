@@ -114,5 +114,31 @@ namespace ChatApp
         {
             errror_create_lb.Visible = false;
         }
+
+
+        //move form
+        bool flag = false;
+        int movX = 0;
+        int movY = 0;
+        private void createRoom_MouseDown(object sender, MouseEventArgs e)
+        {
+            flag = true;
+            movX = e.X;
+            movY = e.Y;
+        }
+
+        private void createRoom_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (flag == true)
+            {
+                //this.Location = Cursor.Position;
+                this.SetDesktopLocation(MousePosition.X - movX, MousePosition.Y - movY);
+            }
+        }
+
+        private void createRoom_MouseUp(object sender, MouseEventArgs e)
+        {
+            flag = false;
+        }
     }
 }

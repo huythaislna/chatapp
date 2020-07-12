@@ -66,6 +66,7 @@ namespace ChatApp
                 client.Connect(serverIpAddress, serverPort);
                 stream = client.GetStream();
                 Thread listen = new Thread(listenToServer);
+                listen.IsBackground = true;
                 listen.Start();
             }
             catch

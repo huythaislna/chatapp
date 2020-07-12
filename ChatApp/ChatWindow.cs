@@ -49,6 +49,7 @@ namespace ChatApp
                 client.Connect(chatIpServer, port);
                 stream = client.GetStream();
                 Thread listen = new Thread(listenToServer);
+                listen.IsBackground = true;
                 listen.Start();
             }
             catch

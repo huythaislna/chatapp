@@ -212,7 +212,7 @@
             this.errror_create_lb.ForeColor = System.Drawing.Color.Red;
             this.errror_create_lb.Location = new System.Drawing.Point(132, 213);
             this.errror_create_lb.Name = "errror_create_lb";
-            this.errror_create_lb.Size = new System.Drawing.Size(222, 20);
+            this.errror_create_lb.Size = new System.Drawing.Size(226, 20);
             this.errror_create_lb.TabIndex = 41;
             this.errror_create_lb.Text = "⚠ Please enter room\'s name";
             this.errror_create_lb.Visible = false;
@@ -245,6 +245,9 @@
             this.Name = "createRoom";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "createRoom";
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.createRoom_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.createRoom_MouseMove);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.createRoom_MouseUp);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.id_pb)).EndInit();
