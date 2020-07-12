@@ -186,8 +186,8 @@ namespace SERVER
                             Room_id = data[2],
                             Room_name = getRoomName(data[2]),
                         };
-                        sendToRoom(adminHeader + "Admin: " + user.Display_name + " joined !!", user.Room_id);
-                        SendData(adminHeader + "Admin: Welcome! " + user.Display_name, client);
+                        sendToRoom(chatHeader + "|" + "Admin: " + user.Display_name + " joined !!", user.Room_id);
+                        SendData(chatHeader + "|" + "Admin: Welcome! " + user.Display_name, client);
                         usersInRoom.Add(user);
                         updateMember(client);
                     }
@@ -196,7 +196,7 @@ namespace SERVER
                     else if (message.StartsWith(chatHeader))
                     {
                         message = message.Substring(message.IndexOf('|') + 1, message.Length - chatHeader.Length - 1);
-                        sendToRoom(chatHeader + getUser(client).Display_name + ": " + message, getUser(client).Room_id);
+                        sendToRoom(chatHeader + '|' + getUser(client).Display_name + ": " + message, getUser(client).Room_id);
                     }
 
 
@@ -241,7 +241,7 @@ namespace SERVER
                             SendData(outSuccessHeader, client);
                             var user = getUser(client);
                             usersInRoom.Remove(user);
-                            sendToRoom(adminHeader + "Admin: " + user.Display_name + " left!!", user.Room_id);
+                            sendToRoom(chatHeader + "|" + "Admin: " + user.Display_name + " left!!", user.Room_id);
 
                             string listMember = "";
                             foreach (User member in usersInRoom)
@@ -250,30 +250,16 @@ namespace SERVER
                                     if (user.Room_id == member.Room_id)
                                         listMember += member.Display_name + '\n';
                             }
-                            sendToRoom(updateMemberHeader + listMember, user.Room_id);
+                            sendToRoom(updateMemberHeader + "|" + listMember, user.Room_id);
                         }
                         catch { }
                     }
                 }
                 catch
                 {
-                    try
-                    {
-                        client.Close();
-                        stream.Close();
-                        var itemToRemove = signedInUsers.Single(r => r.Value == client);
-                        signedInUsers.Remove(itemToRemove.Key);
-                        foreach (var user in usersInRoom)
-                        {
-                            if (user.UserConnection == client)
-                            {
-                                usersInRoom.Remove(user);
-                                sendToRoom(adminHeader + "Admin: " + user.Display_name + " left!!", user.Room_id);
-                            }
-                        }
-                        return;
-                    }
-                    catch { }
+                    client.Close();
+                    stream.Close();
+                    return;
                 }
             }
 
@@ -324,7 +310,7 @@ namespace SERVER
                 if (getUser(client).Room_id == member.Room_id)
                     listMember += member.Display_name + '\n';
             }
-            sendToRoom(updateMemberHeader + listMember, getUser(client).Room_id);
+            sendToRoom(updateMemberHeader + "|" + listMember, getUser(client).Room_id);
         }
         private string createRoomId()
         {

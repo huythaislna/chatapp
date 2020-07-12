@@ -90,7 +90,7 @@ namespace ChatApp
                 message = message.Substring(10, length);
 
                 string[] data = message.Split('|');
-                switch(data[0])
+                switch (data[0])
                 {
                     case "LOGIN_SUCCESS":
                         username = user_tb.Text;
@@ -250,7 +250,7 @@ namespace ChatApp
             }
         }
 
-        
+
 
 
 
@@ -323,7 +323,7 @@ namespace ChatApp
         {
             pw2_error_lb.Text = "";
         }
-       
+
 
         private void signup_btn_Click_1(object sender, EventArgs e)
         {
@@ -397,7 +397,7 @@ namespace ChatApp
 
         private void pw2_tb_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Enter)
+            if (e.KeyCode == Keys.Enter)
             {
                 if (signup_check())
                 {
@@ -420,11 +420,6 @@ namespace ChatApp
         {
             SendData(signOutHeader + "|" + username + "|");
             listenToServer();
-        }
-
-        private void Client_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            SendData(signOutHeader + "|" + username + "|");
         }
     }
 }

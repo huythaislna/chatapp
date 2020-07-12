@@ -96,6 +96,7 @@
             // 
             this.chat_lw.Location = new System.Drawing.Point(7, 32);
             this.chat_lw.Name = "chat_lw";
+            this.chat_lw.ReadOnly = true;
             this.chat_lw.Size = new System.Drawing.Size(536, 340);
             this.chat_lw.TabIndex = 0;
             this.chat_lw.Text = "";

@@ -71,44 +71,35 @@ namespace ChatApp
                 //stream.Flush();
 
                 //process message
-
+                //decrypt incoming message
                 int length = Int32.Parse(XORCipher(message.Substring(0, 10)));
                 message = XORCipher(message.Substring(0, length + 10));
                 message = message.Substring(10, length);
-                //update members in room
-                if (message.StartsWith(updateMemberHeader))
-                    {
-                        member_lv.Items.Clear();
-                        string[] member = message.Remove(0, updateMemberHeader.Length).Split('\n');
-                        foreach (string m in member)
-                        {
-                            ListViewItem it = new ListViewItem(m);
-                            member_lv.Items.Add(it);
-                        }
 
-                    }
-                    //out a chat session
-                    else if (message.StartsWith(outSuccessHeader))
+                    string[] data = message.Split('|');
+                    switch(data[0])
                     {
-                        this.Close();
-                    }
+                        case "UPDATE_MEMBER":
+                            member_lv.Items.Clear();
+                            foreach (string m in data[1].Split('\n'))
+                            {
+                                ListViewItem it = new ListViewItem(m);
+                                member_lv.Items.Add(it);
+                            }
+                            break;
 
-                    //signout
-                    else if (message.StartsWith(signOutHeader))
-                    {
-                        SendData(outRoomHeader);
-                    }
-                    //message chat incoming
-                    else if (message.StartsWith(adminHeader)) 
-                    {
-                        chat_lw.Text += (message.Replace(adminHeader, ""));
-                    }
-                     else if (message.StartsWith(chatHeader))
-                    {
-                        message = message.Replace(chatHeader, "");
-                        print(message);
-                    }
+                        case "OUT_ROOM_SUCCESS":
+                            this.Close();
+                            break;
 
+                        case "SIGN_OUT":
+                            SendData(outRoomHeader);
+                            break;
+
+                        case "CHAT":
+                            print(message.Replace(chatHeader + '|', ""));
+                            break;
+                    }
                 }
                 catch
                 {
@@ -177,7 +168,7 @@ namespace ChatApp
 
         private void print(string m)
         {
-            chat_lw.Text += "\r\n" + m;
+            chat_lw.Text += m + "\r\n";
         }
         private void sendBt_Click(object sender, EventArgs e)
         {

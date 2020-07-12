@@ -749,7 +749,6 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Client";
             this.Text = "Form1";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Client_FormClosed);
             this.Load += new System.EventHandler(this.Client_Load);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseMove);
