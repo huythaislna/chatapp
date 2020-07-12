@@ -356,37 +356,23 @@ namespace ChatApp
         int movY = 0;
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
-
         {
-
             flag = true;
-
+            movX = e.X;
+            movY = e.Y;
         }
 
         private void Form1_MouseMove(object sender, MouseEventArgs e)
-
         {
-
-            //Check if Flag is True ??? if so then make form position same
-
-            //as Cursor position
-
             if (flag == true)
-
             {
-
                 //this.Location = Cursor.Position;
                 this.SetDesktopLocation(MousePosition.X - movX, MousePosition.Y - movY);
-
             }
-
         }
         private void Form1_MouseUp(object sender, MouseEventArgs e)
-
         {
-
             flag = false;
-
         }
 
         private void exit_pb_Click(object sender, EventArgs e)
