@@ -82,7 +82,6 @@ namespace SERVER
             ipAddress = IPAddress.Parse("127.0.0.1");
             TcpServer = new TcpListener(IPAddress.Any, port);
             TcpServer.Start();
-            //status.Text = "Waiting for a connection...";
             Thread serverThread = new Thread(waitForClient);
             serverThread.IsBackground = true;
             serverThread.Start();
@@ -119,141 +118,42 @@ namespace SERVER
                     message = message.Substring(10, length);
                     //prcessing
                     string[] data = message.Split('|');
-                    //sign up
-                    if (message.StartsWith(registerHeader))
-                    {
-                        register(data[1], data[2], data[3], client);
-                    }
-                    //login
-                    else if (message.StartsWith(loginHeader))
-                    {
-                        bool isUsed = false;
-                        foreach (var user in signedInUsers)
-                        {
-                            if (user.Key == data[1])
-                            {
-                                SendData(loginFailHeader + "|" + "This account have been being used", client);
-                                isUsed = true;
-                                break;
-                            }
-                        }
-                        if (isUsed == false)
-                        {
-                            if (authenticate(data[1], data[2]) == true)
-                            {
-                                SendData(loginSuccessHeader, client);
-                                signedInUsers.Add(data[1], client);
-                            }
-                            else SendData(loginFailHeader + "|" + "Username or Password was wrong", client);
-                        }
-                    }
-                    //signout
-                    else if (message.StartsWith(signOutHeader))
-                    {
-                        signedInUsers.Remove(data[1]);
-                        foreach (var user in usersInRoom)
-                        {
-                            if (user.Username == data[1])
-                            {
-                                SendData(signOutHeader, user.UserConnection);
-                            }
-                        }
-                        SendData(signOutSuccess, client);
-                        client.Close();
-                        stream.Close();
-                    }
 
-                    //createroom
-                    else if (message.StartsWith(createRoomHeader))
+                    switch(data[0])
                     {
-                        string room_id = createRoomId();
-                        var usersCollection = database.GetCollection<BsonDocument>("rooms");
-                        usersCollection.InsertOne(
-                            new BsonDocument {
-                                { "id",  room_id},
-                                { "name",  data[1]},
-                        });
-                        SendData(createRoomSuccess + room_id, client);
+                        case "REGISTER":
+                            register(data[1], data[2], data[3], client);
+                            break;
+                        case "LOGIN":
+                            login(data, client);
+                            break;
+                        case "SIGN_OUT":
+                            signout(data, client, stream);
+                            break;
+                        case "CREATE_ROOM":
+                            createRoom(data, client);
+                            break;
+                        case "START_CHAT_SESSION":
+                            startChatSession(data, client);
+                            break;
+                        case "CHAT":
+                            sendToRoom(chatHeader + '|' + getUser(client).Display_name + ": " + message.Substring(message.IndexOf('|') + 1, message.Length - chatHeader.Length - 1)
+                                        , getUser(client).Room_id);
+                            break;
+                        case "JOIN":
+                            join(data, client);
+                            break;
+                        case "UPDATE_MEMBER":
+                            updateMember(client);
+                            break;
+                        case "OUT_ROOM":
+                            outRoom(client);
+                            break;
+                        default:
+                            break;
+                                
                     }
-                    //start chat - initial user 
-                    else if (message.StartsWith(startChatSession))
-                    {
-                        User user = new User
-                        {
-                            UserConnection = client,
-                            Username = data[1],
-                            Display_name = get_display_name(data[1]),
-                            Room_id = data[2],
-                            Room_name = getRoomName(data[2]),
-                        };
-                        sendToRoom(chatHeader + "|" + "Admin: " + user.Display_name + " joined !!", user.Room_id);
-                        SendData(chatHeader + "|" + "Admin: Welcome! " + user.Display_name, client);
-                        usersInRoom.Add(user);
-                        updateMember(client);
-                    }
-
-                    //chat message
-                    else if (message.StartsWith(chatHeader))
-                    {
-                        message = message.Substring(message.IndexOf('|') + 1, message.Length - chatHeader.Length - 1);
-                        sendToRoom(chatHeader + '|' + getUser(client).Display_name + ": " + message, getUser(client).Room_id);
-                    }
-
-
-                    //join room
-                    else if (message.StartsWith(joinHeader))
-                    {
-                        if (IsExistedRoom(data[1]) == true)
-                        {
-                            bool isRedirect = true;
-                            if (data[2][0] > 'd')
-                            {
-                                isRedirect = false;
-                            }
-                            if (checkUserInRoom(data[1], data[2]) == false)
-                            {
-                                if (isRedirect)
-                                    SendData(joinSuccessHeader + "|" + getRoomName(data[1]) + "|" + redirectHeader + secondServer, client);
-                                else
-                                    SendData(joinSuccessHeader + "|" + getRoomName(data[1]) + "|" + redirectHeader, client);
-                            }
-                            else
-                            {
-                                SendData(errorHeader + "|" + "You have already been in room", client);
-                            }
-                        }
-                        else
-                        {
-                            SendData(errorHeader + "|" + "Room is not existed", client);
-                        }
-                    }
-                    //update members
-                    else if (message.StartsWith(updateMemberHeader))
-                    {
-                        updateMember(client);
-                    }
-
-                    //out room
-                    else if (message.StartsWith(outRoomHeader))
-                    {
-                        try
-                        {
-                            SendData(outSuccessHeader, client);
-                            var user = getUser(client);
-                            usersInRoom.Remove(user);
-                            sendToRoom(chatHeader + "|" + "Admin: " + user.Display_name + " left!!", user.Room_id);
-
-                            string listMember = "";
-                            foreach (User member in usersInRoom)
-                            {
-                                if (user != member)
-                                    if (user.Room_id == member.Room_id)
-                                        listMember += member.Display_name + '\n';
-                            }
-                            sendToRoom(updateMemberHeader + "|" + listMember, user.Room_id);
-                        }
-                        catch { }
-                    }
+                    
                 }
                 catch
                 {
@@ -327,7 +227,6 @@ namespace SERVER
 
         private bool authenticate(string username, string pwd)
         {
-            //return true;
             var usersCollection = database.GetCollection<BsonDocument>("users");
             var firstDocument = usersCollection.Find(Builders<BsonDocument>.Filter.Eq("username", username)).FirstOrDefault();
             if (firstDocument == null) return false;
@@ -337,7 +236,6 @@ namespace SERVER
 
         private bool register(string name, string username, string pwd, TcpClient client)
         {
-            // return true
             var usernameRegex = new Regex(@"[a-z\d]{6,15}");
             var hasNumber = new Regex(@"[0-9]+");
             var hasUpperChar = new Regex(@"[A-Z]+");
@@ -397,6 +295,7 @@ namespace SERVER
             return mess;
 
         }
+        //start server
         private void start_btn_Click(object sender, EventArgs e)
         {
             start_btn.Enabled = false;
@@ -405,10 +304,114 @@ namespace SERVER
             power_lb.Text = "ON";
             power_lb.ForeColor = System.Drawing.Color.Green;
         }
-
-        private void Server_Load(object sender, EventArgs e)
+        
+        private void login(string[] data, TcpClient client)
         {
-            //Setup();
+            bool isUsed = false;
+            foreach (var user in signedInUsers)
+            {
+                if (user.Key == data[1])
+                {
+                    SendData(loginFailHeader + "|" + "This account have been being used", client);
+                    isUsed = true;
+                    break;
+                }
+            }
+            if (isUsed == false)
+            {
+                if (authenticate(data[1], data[2]) == true)
+                {
+                    SendData(loginSuccessHeader, client);
+                    signedInUsers.Add(data[1], client);
+                }
+                else SendData(loginFailHeader + "|" + "Username or Password was wrong", client);
+            }
+        }
+        private void signout(string[] data, TcpClient client,NetworkStream stream)
+        {
+            signedInUsers.Remove(data[1]);
+            foreach (var user in usersInRoom)
+            {
+                if (user.Username == data[1])
+                {
+                    SendData(signOutHeader, user.UserConnection);
+                }
+            }
+            SendData(signOutSuccess, client);
+            client.Close();
+            stream.Close();
+        }
+        private void createRoom(string[] data, TcpClient client)
+        {
+            string room_id = createRoomId();
+            var usersCollection = database.GetCollection<BsonDocument>("rooms");
+            usersCollection.InsertOne(
+                new BsonDocument {
+                                { "id",  room_id},
+                                { "name",  data[1]},
+            });
+            SendData(createRoomSuccess + room_id, client);
+        }
+        private void startChatSession(string[] data, TcpClient client)
+        {
+            User user = new User
+            {
+                UserConnection = client,
+                Username = data[1],
+                Display_name = get_display_name(data[1]),
+                Room_id = data[2],
+                Room_name = getRoomName(data[2]),
+            };
+            sendToRoom(chatHeader + "|" + "Admin: " + user.Display_name + " joined !!", user.Room_id);
+            SendData(chatHeader + "|" + "Admin: Welcome! " + user.Display_name, client);
+            usersInRoom.Add(user);
+            updateMember(client);
+        }
+        private void join(string[] data, TcpClient client)
+        {
+            if (IsExistedRoom(data[1]) == true)
+            {
+                bool isRedirect = true;
+                if (data[2][0] > 'd')
+                {
+                    isRedirect = false;
+                }
+                if (checkUserInRoom(data[1], data[2]) == false)
+                {
+                    if (isRedirect)
+                        SendData(joinSuccessHeader + "|" + getRoomName(data[1]) + "|" + redirectHeader + secondServer, client);
+                    else
+                        SendData(joinSuccessHeader + "|" + getRoomName(data[1]) + "|" + redirectHeader, client);
+                }
+                else
+                {
+                    SendData(errorHeader + "|" + "You have already been in room", client);
+                }
+            }
+            else
+            {
+                SendData(errorHeader + "|" + "Room is not existed", client);
+            }
+        }
+        private void outRoom(TcpClient client)
+        {
+            try
+            {
+                SendData(outSuccessHeader, client);
+                var user = getUser(client);
+                usersInRoom.Remove(user);
+                sendToRoom(chatHeader + "|" + "Admin: " + user.Display_name + " left!!", user.Room_id);
+
+                string listMember = "";
+                foreach (User member in usersInRoom)
+                {
+                    if (user != member)
+                        if (user.Room_id == member.Room_id)
+                            listMember += member.Display_name + '\n';
+                }
+                sendToRoom(updateMemberHeader + "|" + listMember, user.Room_id);
+            }
+            catch { }
         }
     }
 }

@@ -141,8 +141,7 @@ namespace ChatApp
                     case "Username is invalid!":
                         username_error_lb.Text = "⚠ " + data[0];
                         break;
-
-
+                        
                 }
             }
             catch
@@ -250,12 +249,7 @@ namespace ChatApp
                 listenToServer();
             }
         }
-
-
-
-
-
-
+        
         //sign up
         private void SIGNUP_KeyDown(object sender, KeyEventArgs e)
         {
@@ -301,8 +295,7 @@ namespace ChatApp
                 return false;
             return true;
         }
-
-
+        
 
         //enter event
         private void username_tb_Enter(object sender, EventArgs e)
