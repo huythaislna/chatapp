@@ -105,6 +105,7 @@ namespace SERVER
         {
             TcpClient client = (TcpClient)Client;
             NetworkStream stream = client.GetStream();
+            log(client.Client.RemoteEndPoint.ToString());
             SendData("Connected to server!", client);
             while (true)
             {
@@ -412,6 +413,13 @@ namespace SERVER
                 sendToRoom(updateMemberHeader + "|" + listMember, user.Room_id);
             }
             catch { }
+        }
+        private void log(string address)
+        {
+            ListViewItem it = new ListViewItem(address);
+            ListViewItem.ListViewSubItem sub = new ListViewItem.ListViewSubItem(it, DateTime.Now.ToString());
+            it.SubItems.Add(sub);
+            log_lv.Items.Insert(0, it);
         }
     }
 }

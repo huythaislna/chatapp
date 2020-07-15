@@ -32,6 +32,9 @@
             this.power_lb = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.log_lv = new System.Windows.Forms.ListView();
+            this.name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.time = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -81,12 +84,36 @@
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
             // 
+            // log_lv
+            // 
+            this.log_lv.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.name,
+            this.time});
+            this.log_lv.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.log_lv.Location = new System.Drawing.Point(401, 43);
+            this.log_lv.Name = "log_lv";
+            this.log_lv.Size = new System.Drawing.Size(522, 395);
+            this.log_lv.TabIndex = 5;
+            this.log_lv.UseCompatibleStateImageBehavior = false;
+            this.log_lv.View = System.Windows.Forms.View.Details;
+            // 
+            // name
+            // 
+            this.name.Text = "ADDRESS";
+            this.name.Width = 180;
+            // 
+            // time
+            // 
+            this.time.Text = "TIME";
+            this.time.Width = 200;
+            // 
             // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.MidnightBlue;
-            this.ClientSize = new System.Drawing.Size(379, 450);
+            this.ClientSize = new System.Drawing.Size(935, 450);
+            this.Controls.Add(this.log_lv);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.power_lb);
             this.Controls.Add(this.start_btn);
@@ -106,6 +133,9 @@
         private System.Windows.Forms.Label power_lb;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.ListView log_lv;
+        private System.Windows.Forms.ColumnHeader name;
+        private System.Windows.Forms.ColumnHeader time;
     }
 }
 
