@@ -28,7 +28,7 @@ namespace ChatApp
 
         public static string chatIpServer = null;
         //declare for setup
-        public string serverIpAddress = "192.168.43.90";
+        public string serverIpAddress = "192.168.1.138";
         public int serverPort = 9999;
 
         public Client()
@@ -89,7 +89,7 @@ namespace ChatApp
                 int length = Int32.Parse(XORCipher(message.Substring(0, 10)));
                 message = XORCipher(message.Substring(0, length + 10));
                 message = message.Substring(10, length);
-                Console.WriteLine(message);
+                Console.WriteLine("client: " + message);
 
                 string[] data = message.Split('|');
                 switch (data[0])
@@ -124,7 +124,7 @@ namespace ChatApp
                         Join_tb.Text = "";
                         error_id_lb.Text = "";
                         ChatWindow cw = new ChatWindow();
-                        cw.Show();
+                        cw.ShowDialog();
                         break;
                     case "REDIRECT":
                         client.Close();

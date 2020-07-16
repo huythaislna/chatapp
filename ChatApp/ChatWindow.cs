@@ -20,54 +20,53 @@ namespace ChatApp
     {
 
         //new stream and tcpClient
-        TcpClient client = null;
-        NetworkStream stream = null;
 
 
         //declare for setup
-        public string chatIpServer = "192.168.43.90";
+        public string chatIpServer = "192.168.1.138";
         public int port = 9999;
 
         public ChatWindow()
         {
             InitializeComponent();
-            connect();
+           // connect();
         }
 
-        private void connect()
-        {
-            Thread stThread = new Thread(Setup);
-            stThread.IsBackground = true;
-            stThread.Start();
-        }
-        private void Setup()
-        {
-            try
-            {
-                CheckForIllegalCrossThreadCalls = false;
-                client = new TcpClient();
-                client.Connect(chatIpServer, port);
-                stream = client.GetStream();
-                Thread listen = new Thread(listenToServer);
-                listen.IsBackground = true;
-                listen.Start();
-            }
-            catch
-            {
-                MessageBox.Show("Can't connect to server");
-                this.Close();
-            }
-        }
+        //private void connect()
+        //{
+        //    Thread stThread = new Thread(Setup);
+        //    stThread.IsBackground = true;
+        //    stThread.Start();
+        //}
+        //private void Setup()
+        //{
+        //    try
+        //    {
+        //        CheckForIllegalCrossThreadCalls = false;
+        //        client = new TcpClient();
+        //        client.Connect(chatIpServer, port);
+        //        stream = client.GetStream();
+        //        Thread listen = new Thread(listenToServer);
+        //        listen.IsBackground = true;
+        //        listen.Start();
+        //    }
+        //    catch
+        //    {
+        //        MessageBox.Show("Can't connect to server");
+        //        this.Close();
+        //    }
+        //}
 
-        private void listenToServer()
+        private void listen()
         {
+
             while (true)
             {
-                try
-                {
+                //try
+                //{
                     var bufferSize = client.ReceiveBufferSize;
                     byte[] instream = new byte[bufferSize];
-                    stream.Read(instream, 0, bufferSize);
+                    Client.client.GetStream().Read(instream, 0, bufferSize);
                     string message = Encoding.UTF8.GetString(instream);
                 //stream.Flush();
 
@@ -81,6 +80,7 @@ namespace ChatApp
                     string[] data = message.Split('|');
                     switch(data[0])
                     {
+
                         case "UPDATE_MEMBER":
                             member_lv.Items.Clear();
                             foreach (string m in data[1].Split('\n'))
@@ -92,6 +92,7 @@ namespace ChatApp
 
                         case "OUT_ROOM_SUCCESS":
                             this.Close();
+                            return;
                             break;
 
                         case "SIGN_OUT":
@@ -101,23 +102,26 @@ namespace ChatApp
                         case "CHAT":
                             print(message.Replace(chatHeader + '|', ""));
                             break;
-                        case "REDIRECT":
-                            client.Close();
-                            stream.Close();
-                            chatIpServer = data[1];
-                            port = Int32.Parse(data[2]);
-                            Setup();
-                            break;
-                    }
+                        
+                        //case "REDIRECT":
+                        //    client.Close();
+                        //    stream.Close();
+                        //    chatIpServer = data[1];
+                        //    Console.WriteLine("ip: " + data[1]);
+                        //    port = Int32.Parse(data[2]);
+                        //    Console.WriteLine("port: " + data[2]);
+                        //    Setup();
+                        //    break;
                 }
-                catch
-                {
-                    MessageBox.Show("Get an unexpected error! Try again later");
-                    client.Close();
-                    stream.Close();
-                    this.Close();
-                    return;
-                }
+                //}
+                //catch
+                //{
+                //    MessageBox.Show("Get an unexpected error! Try again later");
+                //    client.Close();
+                //    stream.Close();
+                //    this.Close();
+                //    return;
+                //}
             }
         }
 
@@ -136,7 +140,7 @@ namespace ChatApp
                 message = XORCipher(message);
 
                 byte[] noti = Encoding.UTF8.GetBytes(message);
-                stream.Write(noti, 0, noti.Length);
+                Client.client.GetStream().Write(noti, 0, noti.Length);
             }
             catch
             {
@@ -149,7 +153,11 @@ namespace ChatApp
 
         private void ChatWindow_Load(object sender, EventArgs e)
         {
-            SendData(startChatSession + "|" + Client.username + "|" + Client.room_id);;
+            print("Admin: Welcome to room " + Client.room_name);
+            Thread t1 = new Thread(listen);
+            t1.IsBackground = true;
+            t1.Start();
+            SendData(startChatSession + "|" + Client.username + "|" + Client.room_id);
             group_name_gb.Text = Client.room_name.ToUpper() + " - ID: " + Client.room_id;
         }
 

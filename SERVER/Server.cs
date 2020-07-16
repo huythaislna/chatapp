@@ -30,7 +30,7 @@ namespace SERVER
 
         }
 
-        string mainServer = "127.0.0.1";
+        string mainServer = "192.168.1.138";
         string secondServer = "192.168.2.221";
         public static int numberOfClient = 0;
         public static TcpClient proxy = null;
@@ -69,6 +69,7 @@ namespace SERVER
             }
             return null;
         }
+        
         private void Setup()
         {
             CheckForIllegalCrossThreadCalls = false;
@@ -374,7 +375,7 @@ namespace SERVER
                 Room_name = getRoomName(data[2]),
             };
             sendToRoom(chatHeader + "|" + "Admin: " + user.Display_name + " joined !!", user.Room_id);
-            SendData(chatHeader + "|" + "Admin: Welcome! " + user.Display_name, client);
+            //SendData(chatHeader + "|" + "Admin: Welcome! " + user.Display_name, client);
             usersInRoom.Add(user);
             updateMember(client);
         }
@@ -382,17 +383,10 @@ namespace SERVER
         {
             if (IsExistedRoom(data[1]) == true)
             {
-                bool isRedirect = true;
-                if (data[2][0] > 'd')
-                {
-                    isRedirect = false;
-                }
+                
                 if (checkUserInRoom(data[1], data[2]) == false)
                 {
-                    if (isRedirect)
-                        SendData(joinSuccessHeader + "|" + getRoomName(data[1]) + "|" + redirectHeader + secondServer, client);
-                    else
-                        SendData(joinSuccessHeader + "|" + getRoomName(data[1]) + "|" + redirectHeader, client);
+                   SendData(joinSuccessHeader + "|" + getRoomName(data[1]) , client);
                 }
                 else
                 {
