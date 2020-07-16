@@ -82,19 +82,14 @@ namespace ChatApp
                     {
 
                         case "UPDATE_MEMBER":
-                            member_lv.Items.Clear();
-                            foreach (string m in data[1].Split('\n'))
-                            {
-                                ListViewItem it = new ListViewItem(m);
-                                member_lv.Items.Add(it);
-                            }
+                            printMember(data[1]);
                             break;
 
                         case "OUT_ROOM_SUCCESS":
                             this.Close();
                             return;
                             break;
-
+                        
                         case "SIGN_OUT":
                             SendData(outRoomHeader);
                             break;
@@ -124,7 +119,24 @@ namespace ChatApp
                 //}
             }
         }
+        private void printMember(string data)
+        {
+            foreach (string m in data.Split('\n'))
+            {
+                
+                foreach (var i in member_lv.Items)
+                {
+                    if(i.ToString() != m)
+                    {
+                        ListViewItem it = new ListViewItem(m);
+                        member_lv.Items.Add(it);
 
+                    }
+                }
+
+                
+            }
+        }
         private void SendData(string message)
         {
             try
