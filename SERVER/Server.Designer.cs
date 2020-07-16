@@ -35,6 +35,7 @@
             this.log_lv = new System.Windows.Forms.ListView();
             this.name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.time = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -90,6 +91,7 @@
             this.name,
             this.time});
             this.log_lv.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.log_lv.HideSelection = false;
             this.log_lv.Location = new System.Drawing.Point(401, 43);
             this.log_lv.Name = "log_lv";
             this.log_lv.Size = new System.Drawing.Size(522, 395);
@@ -107,12 +109,23 @@
             this.time.Text = "TIME";
             this.time.Width = 200;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.label2.Location = new System.Drawing.Point(175, 387);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(16, 17);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "0";
+            // 
             // Server
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.MidnightBlue;
             this.ClientSize = new System.Drawing.Size(935, 450);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.log_lv);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.power_lb);
@@ -136,6 +149,7 @@
         private System.Windows.Forms.ListView log_lv;
         private System.Windows.Forms.ColumnHeader name;
         private System.Windows.Forms.ColumnHeader time;
+        private System.Windows.Forms.Label label2;
     }
 }
 

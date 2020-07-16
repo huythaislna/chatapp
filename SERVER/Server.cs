@@ -1,23 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using BCrypt.Net;
-using MongoDB.Driver.Core.Authentication;
 using System.Text.RegularExpressions;
 using static SERVER.Header;
 using static SERVER.Cipher;
-using System.Security.Cryptography;
 
 namespace SERVER
 {
@@ -38,7 +31,8 @@ namespace SERVER
         }
 
         string mainServer = "127.0.0.1";
-        string secondServer = "127.0.0.1";
+        string secondServer = "192.168.2.221";
+        public static int numberOfClient = 0;
 
         IPAddress ipAddress;
         Int32 port = 8080;
@@ -114,6 +108,7 @@ namespace SERVER
                 {
                     string message = ReceiveData(stream, client);
 
+                    Console.WriteLine(message);
                     int length = Int32.Parse(XORCipher(message.Substring(0, 10)));
                     message = XORCipher(message.Substring(0, length + 10));
                     message = message.Substring(10, length);
@@ -149,6 +144,9 @@ namespace SERVER
                             break;
                         case "OUT_ROOM":
                             outRoom(client);
+                            break;
+                        case "SERVER_INFO":
+                            SendData(label2.Text, client);
                             break;
                         default:
                             break;

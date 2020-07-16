@@ -28,8 +28,8 @@ namespace ChatApp
 
         public static string chatIpServer = null;
         //declare for setup
-        public const string serverIpAddress = "127.0.0.1";
-        public const int serverPort = 8080;
+        public string serverIpAddress = "192.168.43.90";
+        public int serverPort = 9999;
 
         public Client()
         {
@@ -89,6 +89,7 @@ namespace ChatApp
                 int length = Int32.Parse(XORCipher(message.Substring(0, 10)));
                 message = XORCipher(message.Substring(0, length + 10));
                 message = message.Substring(10, length);
+                Console.WriteLine(message);
 
                 string[] data = message.Split('|');
                 switch (data[0])
@@ -120,13 +121,17 @@ namespace ChatApp
                     case "JOIN_SUCCESS":
                         room_id = Join_tb.Text;
                         room_name = data[1];
-                        chatIpServer = data[2].Replace(redirectHeader, "");
-                        if (chatIpServer == null)
-                            chatIpServer = serverIpAddress;
                         Join_tb.Text = "";
                         error_id_lb.Text = "";
                         ChatWindow cw = new ChatWindow();
                         cw.Show();
+                        break;
+                    case "REDIRECT":
+                        client.Close();
+                        stream.Close();
+                        serverIpAddress = data[1];
+                        serverPort = Int32.Parse(data[2]);
+                        Setup();
                         break;
 
                     case "Sign up successful!":

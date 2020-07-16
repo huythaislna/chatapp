@@ -25,8 +25,8 @@ namespace ChatApp
 
 
         //declare for setup
-        public string chatIpServer = serverIpAddress;
-        public const int port = serverPort;
+        public string chatIpServer = "192.168.43.90";
+        public int port = 9999;
 
         public ChatWindow()
         {
@@ -99,6 +99,13 @@ namespace ChatApp
 
                         case "CHAT":
                             print(message.Replace(chatHeader + '|', ""));
+                            break;
+                        case "REDIRECT":
+                            client.Close();
+                            stream.Close();
+                            chatIpServer = data[1];
+                            port = Int32.Parse(data[2]);
+                            Setup();
                             break;
                     }
                 }
