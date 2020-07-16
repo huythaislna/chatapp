@@ -33,6 +33,7 @@ namespace SERVER
         string mainServer = "127.0.0.1";
         string secondServer = "192.168.2.221";
         public static int numberOfClient = 0;
+        public static TcpClient proxy = null;
 
         IPAddress ipAddress;
         Int32 port = 8080;
@@ -135,6 +136,7 @@ namespace SERVER
                         case "CHAT":
                             sendToRoom(chatHeader + '|' + getUser(client).Display_name + ": " + message.Substring(message.IndexOf('|') + 1, message.Length - chatHeader.Length - 1)
                                         , getUser(client).Room_id);
+
                             break;
                         case "JOIN":
                             join(data, client);
@@ -146,7 +148,10 @@ namespace SERVER
                             outRoom(client);
                             break;
                         case "SERVER_INFO":
-                            SendData(label2.Text, client);
+                            proxy = client;
+                            break;
+                        case "CHAT_PROXY":
+                            sendToRoom(message, data[1]);
                             break;
                         default:
                             break;
@@ -192,11 +197,18 @@ namespace SERVER
         }
         private void sendToRoom(string message, string room_id)
         {
-            foreach (var user in usersInRoom)
+            if (!message.StartsWith("CHAT_PROXY"))
+                SendData("CHAT_PROXY" + "|" + room_id + "|" + message, proxy);
+            else
             {
-                if (user.Room_id == room_id)
+                message = message.Remove(0, 18);
+                Console.WriteLine("Server sent: " + message);
+                foreach (var user in usersInRoom)
                 {
-                    SendData(message, user.UserConnection);
+                    if (user.Room_id == room_id)
+                    {
+                        SendData(message, user.UserConnection);
+                    }
                 }
             }
         }

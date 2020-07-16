@@ -76,6 +76,7 @@ namespace ChatApp
                 int length = Int32.Parse(XORCipher(message.Substring(0, 10)));
                 message = XORCipher(message.Substring(0, length + 10));
                 message = message.Substring(10, length);
+                    Console.WriteLine("windows chat: " + message);
 
                     string[] data = message.Split('|');
                     switch(data[0])
